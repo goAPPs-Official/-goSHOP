@@ -1,0 +1,4841 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀DiViA™ AI Live Agent Service</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ── RESET & SHELL VARS ── */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    :root {
+      --gold: #D4AF37;
+      --gold-light: #F9E29C;
+      --gold-dim: #8A6D3B;
+      --gold-glow: rgba(212, 175, 55, 0.22);
+      --bg: #080809;
+      --sidebar-bg: #0D0D0F;
+      --sidebar-w: 268px;
+      --card-bg: #131316;
+      --border: rgba(212, 175, 55, 0.13);
+      --text: #F0F0F2;
+      --muted: #6E6E78;
+      --accent: #00C97A;
+      --topbar-h: 52px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      display: flex;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 55, 0.28);
+      border-radius: 4px;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-18px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.35
+      }
+    }
+
+    @keyframes glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 6px var(--gold-glow)
+      }
+
+      50% {
+        box-shadow: 0 0 24px rgba(212, 175, 55, 0.4)
+      }
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(14px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    @keyframes moduleBar {
+      from {
+        transform: translateX(-60%)
+      }
+
+      to {
+        transform: translateX(160%)
+      }
+    }
+
+    /* Nav sub-item href badge */
+    .nav-sub-item .sub-badge {
+      margin-left: auto;
+      font-size: 0.52rem;
+      letter-spacing: 0.5px;
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--gold-dim);
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      border-radius: 4px;
+      padding: 1px 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .nav-sub-item:hover .sub-badge,
+    .nav-sub-item.active .sub-badge {
+      opacity: 1;
+      color: var(--gold);
+      background: rgba(212, 175, 55, 0.2);
+    }
+
+    /* ══ SIDEBAR ══ */
+    #sidebar {
+      width: var(--sidebar-w);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: width 0.33s var(--ease);
+      z-index: 200;
+      overflow: hidden;
+    }
+
+    #sidebar.collapsed {
+      width: 0;
+    }
+
+    .sb-logo {
+      padding: 20px 16px 15px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .sb-logo-mark {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      white-space: nowrap;
+      background: linear-gradient(130deg, var(--gold), var(--gold-light), var(--gold-dim));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sb-logo-sub {
+      font-size: 0.55rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .sb-search {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sb-search input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 11px;
+      font-size: 0.73rem;
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .sb-search input:focus {
+      border-color: var(--gold);
+    }
+
+    .sb-search input::placeholder {
+      color: var(--muted);
+    }
+
+    .sb-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 0 14px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold-glow) transparent;
+    }
+
+    .nav-cat {
+      opacity: 0;
+      animation: slideInLeft 0.38s var(--ease) forwards;
+    }
+
+    .nav-cat-hdr {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: background 0.18s;
+      border-left: 2px solid transparent;
+      user-select: none;
+    }
+
+    .nav-cat-hdr:hover {
+      background: var(--gold-glow);
+      border-left-color: var(--gold);
+    }
+
+    .nav-cat-hdr.open,
+    .nav-cat-hdr.active-cat {
+      background: rgba(212, 175, 55, 0.08);
+      border-left-color: var(--gold);
+    }
+
+    .nch-icon {
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .nch-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--muted);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-cat-hdr:hover .nch-label,
+    .nav-cat-hdr.open .nch-label,
+    .nav-cat-hdr.active-cat .nch-label {
+      color: var(--gold-light);
+    }
+
+    .nch-arrow {
+      font-size: 0.58rem;
+      color: var(--muted);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+
+    .nav-cat-hdr.open .nch-arrow {
+      transform: rotate(180deg);
+    }
+
+    .nav-sub {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s var(--ease);
+    }
+
+    .nav-sub.open {
+      max-height: 420px;
+    }
+
+    .nav-sub-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px 8px 40px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.17s;
+      border-left: 2px solid transparent;
+    }
+
+    .nav-sub-item:hover {
+      color: var(--gold-light);
+      background: rgba(212, 175, 55, 0.05);
+    }
+
+    .nav-sub-item.active {
+      color: var(--gold);
+      background: rgba(212, 175, 55, 0.09);
+      border-left-color: var(--gold);
+      font-weight: 700;
+    }
+
+    .nav-sub-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .sb-footer {
+      padding: 11px 14px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sb-footer-txt {
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 0.8px;
+    }
+
+    .status-pip {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2.5s infinite;
+    }
+
+    /* ══ RIGHT COLUMN ══ */
+    #right-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    /* ══ TOPBAR ══ */
+    #topbar {
+      height: var(--topbar-h);
+      background: rgba(8, 8, 9, 0.92);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      flex-shrink: 0;
+    }
+
+    .tb-left {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tb-menu {
+      width: 32px;
+      height: 32px;
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--gold);
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .tb-menu:hover {
+      background: var(--gold-glow);
+      border-color: var(--gold);
+    }
+
+    .tb-brand-name {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .tb-breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.62rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tb-bc-sep {
+      color: var(--gold);
+      opacity: 0.45;
+    }
+
+    .tb-bc-cur {
+      color: var(--gold-light);
+    }
+
+    .wallet-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(212, 175, 55, 0.07);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 13px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+    }
+
+    .wallet-lbl {
+      color: var(--muted);
+    }
+
+    .wallet-amt {
+      color: var(--gold-light);
+      font-weight: 700;
+    }
+
+    .live-badge {
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: rgba(0, 201, 122, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0, 201, 122, 0.22);
+      white-space: nowrap;
+    }
+
+    /* ══ VISHA HOST ══ */
+    #visha-host {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      /* Reset body-level centering that ViShA applies */
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: stretch;
+      background: linear-gradient(135deg, #E8F4F2 0%, #F0F4F8 40%, #EEF0FB 100%);
+    }
+
+    /* ── Override ViShA body-scoped styles that conflict ── */
+    #visha-host .chat-window {
+      border-radius: 0 !important;
+      max-width: 100% !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-height: none !important;
+      box-shadow: none !important;
+      animation: none !important;
+    }
+
+    /* Suppress ViShA's own body pseudo-elements (can't remove them, but we cover them) */
+
+    /* ══ WA REDIRECT MODAL ══ */
+    #wa-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.94);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+
+    .wa-card {
+      background: var(--card-bg);
+      border: 1px solid var(--gold);
+      padding: 44px 36px;
+      border-radius: 22px;
+      text-align: center;
+      max-width: 360px;
+      width: 88%;
+      animation: glow 2.5s infinite;
+    }
+
+    .wa-title {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: 1rem;
+      letter-spacing: 3px;
+    }
+
+    .wa-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 7px;
+    }
+
+    .wa-count {
+      font-size: 4rem;
+      font-weight: 800;
+      color: var(--gold);
+      margin: 14px 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .wa-app {
+      color: var(--gold-light);
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    /* ══ MOBILE ══ */
+    #mob-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 199;
+      backdrop-filter: blur(2px);
+    }
+
+    #mob-overlay.active {
+      display: block;
+    }
+
+    @media(max-width:768px) {
+      :root {
+        --sidebar-w: 258px;
+      }
+
+      #sidebar {
+        position: fixed;
+        left: calc(-1 * var(--sidebar-w));
+        height: 100%;
+        transition: left 0.33s var(--ease);
+        width: var(--sidebar-w) !important;
+      }
+
+      #sidebar.mob-open {
+        left: 0;
+      }
+
+      .wallet-chip {
+        display: none;
+      }
+    }
+  </style>
+
+  <!-- ViShA original styles — scoped overrides applied above -->
+  <style id="visha-styles">
+    :root {
+      --teal: #00C9A7;
+      --teal-deep: rgb(3, 90, 133);
+      --teal-glow: rgba(0, 201, 167, 0.18);
+      --coral: #FF6B6B;
+      --amber: #FFB347;
+      --indigo: #6C63FF;
+      --bg: #F0F4F8;
+      --surface: #FFFFFF;
+      --surface2: #F7FAFB;
+      --surface3: #EEF3F7;
+      --border: #E2EAF0;
+      --border2: #D0DCE8;
+      --text: #1A2332;
+      --text-muted: #6B7A8F;
+      --text-dim: #A0AEBF;
+      --shadow: 0 2px 16px rgba(26, 35, 50, 0.08);
+      --shadow-lg: 0 8px 40px rgba(26, 35, 50, 0.14);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --wa: #25D366;
+      --wa-deep: #128C7E;
+      /* Store module accent */
+      --store: #6C63FF;
+      --store-light: rgba(108, 99, 255, 0.1);
+      --store-glow: rgba(108, 99, 255, 0.18);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text);
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 4px;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #E8F4F2 0%, #F0F4F8 40%, #EEF0FB 100%);
+      padding: 0;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px;
+      right: -80px;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 201, 167, 0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -100px;
+      left: -60px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108, 99, 255, 0.1), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* CHAT WINDOW — fully responsive, no mobile container */
+    .chat-window {
+      width: 100%;
+      height: 100dvh;
+      background: var(--surface);
+      border-radius: 0;
+      box-shadow: none;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      animation: rise .4s cubic-bezier(.34, 1.56, .64, 1);
+    }
+
+    @media (min-width: 600px) {
+      body {
+        padding: 20px;
+      }
+
+      .chat-window {
+        max-width: 520px;
+        height: 92vh;
+        max-height: 860px;
+        border-radius: 24px;
+        box-shadow: var(--shadow-lg);
+      }
+    }
+
+    /* ── Mobile-first refinements ── */
+    @media (max-width: 599px) {
+      .header {
+        padding: 12px 14px 10px;
+      }
+
+      .header-name {
+        font-size: 15px;
+      }
+
+      .header-status {
+        font-size: 11px;
+      }
+
+      .hbtn {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+      }
+
+      .messages {
+        padding: 12px 10px;
+        gap: 9px;
+      }
+
+      .bubble {
+        font-size: 13px;
+        padding: 9px 12px;
+      }
+
+      .chip {
+        font-size: 12px;
+        padding: 6px 11px;
+      }
+
+      .pc-name {
+        font-size: 12.5px;
+      }
+
+      .pc-price {
+        font-size: 13px;
+      }
+
+      .pc-store {
+        font-size: 10.5px;
+      }
+
+      .mall-grid {
+        gap: 7px;
+      }
+
+      .mall-card {
+        padding: 10px 8px;
+      }
+
+      .mc-name {
+        font-size: 11px;
+      }
+
+      .sheet {
+        border-radius: 20px 20px 0 0;
+      }
+
+      .sheet-title {
+        font-size: 14px;
+      }
+
+      .input-area {
+        padding: 10px 12px;
+      }
+
+      .send-btn {
+        width: 38px;
+        height: 38px;
+      }
+
+      .wa-btn {
+        font-size: 13px;
+        padding: 12px 16px;
+      }
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(.97);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, var(--teal-deep), var(--teal));
+      padding: 16px 18px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .bot-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .header-info {
+      flex: 1;
+    }
+
+    .header-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .header-status {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #A8F0DB;
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .4;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .hbtn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.18);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: #fff;
+      transition: .18s;
+    }
+
+    .hbtn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* MALL BANNER */
+    .mall-banner {
+      background: linear-gradient(90deg, var(--teal-glow), transparent);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      font-size: 12px;
+      color: var(--teal-deep);
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mall-banner.show {
+      display: flex;
+    }
+
+    /* MESSAGES */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* BUBBLES */
+    .msg {
+      display: flex;
+      gap: 8px;
+      animation: fadeUp .25s ease;
+      max-width: 100%;
+    }
+
+    .msg.user {
+      flex-direction: row-reverse;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .msg-av {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .msg.bot .msg-av {
+      background: linear-gradient(135deg, var(--teal-deep), var(--teal));
+      box-shadow: 0 2px 8px var(--teal-glow);
+    }
+
+    .msg.user .msg-av {
+      background: var(--surface3);
+      border: 1px solid var(--border);
+    }
+
+    .msg-col {
+      display: flex;
+      flex-direction: column;
+      max-width: 82%;
+    }
+
+    .msg.user .msg-col {
+      align-items: flex-end;
+    }
+
+    .bubble {
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .msg.bot .bubble {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-top-left-radius: 5px;
+      color: var(--text);
+    }
+
+    .msg.user .bubble {
+      background: linear-gradient(135deg, var(--teal-deep), var(--teal));
+      color: #fff;
+      border-top-right-radius: 5px;
+      box-shadow: 0 3px 12px var(--teal-glow);
+    }
+
+    .bubble b,
+    .bubble strong {
+      color: var(--teal-deep);
+    }
+
+    .msg.user .bubble b,
+    .msg.user .bubble strong {
+      color: #fff;
+    }
+
+    .msg-time {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* TYPING */
+    .typing-bubble {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      border-top-left-radius: 5px;
+      padding: 12px 16px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .td {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: tdB 1.1s infinite;
+    }
+
+    .td:nth-child(2) {
+      animation-delay: .18s;
+    }
+
+    .td:nth-child(3) {
+      animation-delay: .36s;
+    }
+
+    @keyframes tdB {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+        opacity: .4;
+      }
+
+      30% {
+        transform: translateY(-6px);
+        opacity: 1;
+      }
+    }
+
+    /* CHIPS */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--teal-deep);
+      padding: 7px 13px;
+      border-radius: 20px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .18s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .chip:hover {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .chip.store-chip {
+      border-color: var(--store);
+      color: var(--store);
+    }
+
+    .chip.store-chip:hover {
+      background: var(--store);
+      border-color: var(--store);
+      color: #fff;
+    }
+
+    /* MALL GRID */
+    .mall-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .mall-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      cursor: pointer;
+      transition: .2s;
+      text-align: center;
+    }
+
+    .mall-card:hover {
+      border-color: var(--teal);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px var(--teal-glow);
+    }
+
+    .mall-card.selected {
+      border-color: var(--teal);
+      background: rgba(0, 201, 167, 0.07);
+    }
+
+    .mc-emoji {
+      font-size: 26px;
+      margin-bottom: 4px;
+    }
+
+    .mc-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .mc-loc {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .mc-tag {
+      font-size: 9.5px;
+      padding: 2px 7px;
+      border-radius: 8px;
+      background: rgba(0, 201, 167, 0.1);
+      color: var(--teal-deep);
+      border: 1px solid rgba(0, 201, 167, 0.2);
+      margin-top: 4px;
+      display: inline-block;
+    }
+
+    /* PRODUCT CARDS */
+    .product-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .product-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 10px;
+      cursor: pointer;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .product-card:hover {
+      border-color: var(--teal);
+      box-shadow: 0 3px 12px var(--teal-glow);
+    }
+
+    .product-card.in-cart {
+      border-color: var(--teal);
+      background: rgba(0, 201, 167, 0.04);
+    }
+
+    .pc-emoji {
+      font-size: 26px;
+      width: 58px;
+      height: 58px;
+      background: var(--surface2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .pc-img {
+      width: 58px;
+      height: 58px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--surface2);
+      display: block;
+      transition: transform .25s ease;
+    }
+
+    .product-card:hover .pc-img {
+      transform: scale(1.06);
+    }
+
+    .pc-img-wrap {
+      width: 58px;
+      height: 58px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--surface2);
+      position: relative;
+    }
+
+    .pc-img-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      background: var(--surface2);
+    }
+
+    .pc-info {
+      flex: 1;
+    }
+
+    .pc-name {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .pc-store {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .pc-price {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--teal-deep);
+    }
+
+    .pc-add {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--teal);
+      border: none;
+      cursor: pointer;
+      color: #fff;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .18s;
+      flex-shrink: 0;
+    }
+
+    .pc-add:hover {
+      background: var(--teal-deep);
+      transform: scale(1.1);
+    }
+
+    .pc-badge {
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+
+    .badge-hot {
+      background: rgba(255, 107, 107, 0.15);
+      color: var(--coral);
+    }
+
+    .badge-sale {
+      background: rgba(255, 179, 71, 0.15);
+      color: var(--amber);
+    }
+
+    .badge-new {
+      background: rgba(0, 201, 167, 0.12);
+      color: var(--teal-deep);
+    }
+
+    .stars {
+      color: #FFB347;
+      font-size: 11px;
+    }
+
+    /* CART CARD */
+    .cart-card {
+      background: linear-gradient(135deg, rgba(0, 201, 167, 0.06), rgba(0, 160, 134, 0.03));
+      border: 1.5px solid rgba(0, 201, 167, 0.25);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .cart-item-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(0, 201, 167, 0.15);
+    }
+
+    .cart-item-row:last-of-type {
+      border-bottom: none;
+    }
+
+    .cir-emoji {
+      font-size: 18px;
+    }
+
+    .cir-name {
+      font-size: 12px;
+      flex: 1;
+      font-weight: 500;
+    }
+
+    .cir-price {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--teal-deep);
+    }
+
+    .cart-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1.5px solid rgba(0, 201, 167, 0.25);
+    }
+
+    /* INFO CARD */
+    .info-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .ic-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ic-row:last-child {
+      border-bottom: none;
+    }
+
+    .ic-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .ic-text {
+      font-size: 12.5px;
+      line-height: 1.55;
+      flex: 1;
+    }
+
+    .ic-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      font-weight: 600;
+    }
+
+    /* PROMO */
+    .promo-card {
+      background: linear-gradient(135deg, #FFB347, #FF6B6B);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .promo-text {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #fff;
+      flex: 1;
+    }
+
+    .promo-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 3px 8px;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    /* WA BUTTON */
+    .wa-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 13px 20px;
+      background: linear-gradient(135deg, var(--wa-deep), var(--wa));
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: .2s;
+      box-shadow: 0 4px 16px rgba(37, 211, 102, 0.28);
+    }
+
+    .wa-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 22px rgba(37, 211, 102, 0.45);
+    }
+
+    .wa-btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--wa);
+      color: var(--wa-deep);
+      box-shadow: none;
+    }
+
+    .wa-btn-ghost:hover {
+      background: rgba(37, 211, 102, 0.08);
+    }
+
+    /* STORE BUTTON */
+    .store-btn {
+      background: linear-gradient(135deg, #4F46E5, var(--store));
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      padding: 13px 20px;
+      margin-top: 10px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: .2s;
+      box-shadow: 0 4px 16px rgba(108, 99, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .store-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 22px rgba(108, 99, 255, 0.45);
+    }
+
+    .store-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* INPUT */
+    .input-area {
+      border-top: 1px solid var(--border);
+      padding: 12px 14px;
+      background: var(--surface);
+      display: flex;
+      gap: 9px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+
+    .input-box {
+      flex: 1;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      display: flex;
+      align-items: flex-end;
+      gap: 7px;
+      padding: 9px 13px;
+      transition: .2s;
+    }
+
+    .input-box:focus-within {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-glow);
+    }
+
+    .chat-input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 13.5px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      resize: none;
+      max-height: 80px;
+      line-height: 1.5;
+    }
+
+    .chat-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--teal-deep), var(--teal));
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #fff;
+      box-shadow: 0 3px 10px var(--teal-glow);
+      transition: .18s;
+      flex-shrink: 0;
+    }
+
+    .send-btn:hover {
+      transform: scale(1.07);
+    }
+
+    /* OVERLAYS */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 35, 50, 0.5);
+      backdrop-filter: blur(3px);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .overlay.open {
+      display: flex;
+    }
+
+    .sheet {
+      background: var(--surface);
+      border-radius: 24px 24px 0 0;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: slideUp .28s cubic-bezier(.34, 1.2, .64, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+      }
+
+      to {
+        transform: none;
+      }
+    }
+
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      border-radius: 4px;
+      background: var(--border2);
+      margin: 12px auto 0;
+    }
+
+    .sheet-header {
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sheet-title {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .sheet-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .sheet-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 18px;
+    }
+
+    .sheet-footer {
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .form-group {
+      margin-bottom: 13px;
+    }
+
+    .form-label {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 13px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      outline: none;
+      transition: .2s;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px var(--teal-glow);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0;
+    }
+
+    /* ═══════════════════════════════════════════════
+   STORE MODULE STYLES
+   ═══════════════════════════════════════════════ */
+
+    /* Store hero card in chat */
+    .store-hero {
+      background: linear-gradient(135deg, #4F46E5, #6C63FF, #8B80FF);
+      border-radius: 16px;
+      padding: 18px;
+      margin-top: 8px;
+      width: 100%;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .store-hero::before {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .store-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -20px;
+      left: -20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .sh-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      position: relative;
+    }
+
+    .sh-sub {
+      font-size: 12px;
+      opacity: 0.85;
+      position: relative;
+      line-height: 1.5;
+    }
+
+    .sh-steps {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+      position: relative;
+    }
+
+    .sh-step {
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .sh-step-num {
+      font-size: 9px;
+      font-weight: 800;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .sh-step-txt {
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* Store card in merchant listing */
+    .merchant-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .merchant-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .merchant-card:hover {
+      border-color: var(--store);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px var(--store-glow);
+    }
+
+    .mc-store-badge {
+      font-size: 9px;
+      padding: 2px 8px;
+      border-radius: 8px;
+      background: var(--store-light);
+      color: var(--store);
+      border: 1px solid rgba(108, 99, 255, 0.2);
+      display: inline-block;
+      margin-top: 4px;
+      font-weight: 700;
+    }
+
+    .mc-store-count {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Product upload zone */
+    .upload-zone {
+      border: 2px dashed var(--border2);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+      background: var(--surface2);
+    }
+
+    .upload-zone:hover,
+    .upload-zone.drag {
+      border-color: var(--teal);
+      background: rgba(0, 201, 167, 0.04);
+    }
+
+    .upload-zone input {
+      display: none;
+    }
+
+    .uz-icon {
+      font-size: 30px;
+      margin-bottom: 6px;
+    }
+
+    .uz-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .uz-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+
+    /* Product row in store product list */
+    .store-product-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 7px;
+    }
+
+    .spr-emoji {
+      font-size: 22px;
+      width: 38px;
+      height: 38px;
+      background: var(--surface);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .spr-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .spr-name {
+      font-size: 12.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .spr-price {
+      font-size: 12px;
+      color: var(--teal-deep);
+      font-weight: 700;
+    }
+
+    .spr-del {
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      border-radius: 7px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 11px;
+      color: var(--coral);
+      font-weight: 700;
+      transition: .18s;
+      flex-shrink: 0;
+    }
+
+    .spr-del:hover {
+      background: var(--coral);
+      color: #fff;
+    }
+
+    /* PIN pad */
+    .pin-section {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-top: 12px;
+    }
+
+    .pin-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    .pin-dots {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .pin-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 2px solid var(--border2);
+      background: transparent;
+      transition: .2s;
+    }
+
+    .pin-dot.filled {
+      background: var(--store);
+      border-color: var(--store);
+      box-shadow: 0 0 8px rgba(108, 99, 255, 0.4);
+    }
+
+    .pin-dot.err {
+      background: var(--coral);
+      border-color: var(--coral);
+      animation: pinShake .4s ease;
+    }
+
+    @keyframes pinShake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      25% {
+        transform: translateX(-4px)
+      }
+
+      75% {
+        transform: translateX(4px)
+      }
+    }
+
+    .pin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .pin-key {
+      padding: 13px 8px;
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .15s;
+      text-align: center;
+      user-select: none;
+    }
+
+    .pin-key:hover {
+      background: var(--store-light);
+      border-color: var(--store);
+    }
+
+    .pin-key:active {
+      transform: scale(.93);
+    }
+
+    .pin-key.del {
+      color: var(--coral);
+      border-color: rgba(255, 107, 107, 0.25);
+    }
+
+    .pin-key.del:hover {
+      background: rgba(255, 107, 107, 0.08);
+    }
+
+    .pin-key.ok {
+      background: linear-gradient(135deg, #4F46E5, var(--store));
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 14px rgba(108, 99, 255, 0.3);
+    }
+
+    .pin-key.ok:hover {
+      filter: brightness(1.1);
+    }
+
+    .pin-err-msg {
+      text-align: center;
+      font-size: 12px;
+      color: var(--coral);
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* Progress steps */
+    .reg-steps {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .rs-node {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: .3s;
+    }
+
+    .rs-node.active {
+      background: var(--store);
+      border-color: var(--store);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(108, 99, 255, 0.35);
+    }
+
+    .rs-node.done {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+    }
+
+    .rs-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Store dashboard card */
+    .store-dash {
+      background: linear-gradient(135deg, rgba(79, 70, 229, 0.07), rgba(108, 99, 255, 0.04));
+      border: 1.5px solid rgba(108, 99, 255, 0.2);
+      border-radius: 14px;
+      padding: 14px;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .sd-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .sd-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #4F46E5, var(--store));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .sd-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .sd-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .sd-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 201, 167, 0.1);
+      border: 1px solid rgba(0, 201, 167, 0.25);
+      border-radius: 8px;
+      padding: 2px 8px;
+      font-size: 9.5px;
+      font-weight: 700;
+      color: var(--teal-deep);
+      margin-top: 3px;
+    }
+
+    .sd-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .sd-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 9px;
+      text-align: center;
+    }
+
+    .sd-stat-val {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--store);
+    }
+
+    .sd-stat-lbl {
+      font-size: 9.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .sd-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .sd-action {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: .2s;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .sd-action:hover {
+      border-color: var(--store);
+      color: var(--store);
+      background: var(--store-light);
+    }
+
+    .sd-action.primary {
+      background: linear-gradient(135deg, #4F46E5, var(--store));
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+    }
+
+    .sd-action.primary:hover {
+      filter: brightness(1.07);
+    }
+
+    /* Quota bar */
+    .quota-bar-wrap {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 8px;
+    }
+
+    .qb-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-bottom: 7px;
+    }
+
+    .qb-track {
+      height: 8px;
+      background: var(--border2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .qb-fill {
+      height: 100%;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--teal), var(--store));
+      transition: width .5s ease;
+    }
+
+    .qb-fill.warn {
+      background: linear-gradient(90deg, var(--amber), var(--coral));
+    }
+
+    .qb-sub {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    /* CSV template info */
+    .csv-info {
+      background: rgba(108, 99, 255, 0.06);
+      border: 1px solid rgba(108, 99, 255, 0.2);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .csv-info-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--store);
+      margin-bottom: 6px;
+    }
+
+    .csv-col {
+      display: inline-block;
+      background: var(--store-light);
+      color: var(--store);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 10.5px;
+      font-weight: 700;
+      margin: 2px 2px 2px 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Alert pill */
+    .alert-pill {
+      background: rgba(255, 107, 107, 0.1);
+      border: 1px solid rgba(255, 107, 107, 0.25);
+      border-radius: 10px;
+      padding: 10px 13px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .ap-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .ap-text {
+      font-size: 12px;
+      color: var(--coral);
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    /* Store listing in browse */
+    .store-listing {
+      background: var(--surface);
+      border: 1.5px solid rgba(108, 99, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 7px;
+      cursor: pointer;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .store-listing:hover {
+      border-color: var(--store);
+      box-shadow: 0 3px 12px var(--store-glow);
+    }
+
+    .sl-emoji {
+      width: 42px;
+      height: 42px;
+      background: var(--store-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .sl-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sl-name {
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .sl-loc {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .sl-count {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--store);
+      margin-top: 2px;
+    }
+
+    .sl-arrow {
+      color: var(--text-dim);
+      font-size: 16px;
+    }
+
+    /* QUANTITY STEPPER on product cards */
+    .qty-stepper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .qty-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1.5px solid var(--border2);
+      background: var(--surface);
+      color: var(--teal-deep);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .15s;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .qty-btn:hover {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+    }
+
+    .qty-val {
+      min-width: 22px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* QUANTITY CONFIRMATION MODAL */
+    .qty-confirm-sheet .sheet-body {
+      padding: 20px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .qcs-product {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 18px;
+    }
+
+    .qcs-emoji {
+      font-size: 32px;
+      width: 52px;
+      height: 52px;
+      background: var(--surface);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+    }
+
+    .qcs-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .qcs-price {
+      font-size: 13px;
+      color: var(--teal-deep);
+      font-weight: 700;
+      margin-top: 3px;
+    }
+
+    .qcs-store {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .qcs-qty-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+
+    .qcs-qty-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .qcs-stepper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .qcs-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 2px solid var(--border2);
+      background: var(--surface);
+      color: var(--teal-deep);
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: .15s;
+    }
+
+    .qcs-btn:hover {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #fff;
+    }
+
+    .qcs-count {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      min-width: 32px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .qcs-subtotal {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0 4px;
+      border-top: 1px solid var(--border);
+    }
+
+    .qcs-subtotal-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .qcs-subtotal-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--teal-deep);
+    }
+
+    /* Cart item quantity display */
+    .cir-qty {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--teal-deep);
+      background: rgba(0, 201, 167, 0.1);
+      border-radius: 5px;
+      padding: 1px 5px;
+      margin-left: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="mob-overlay" onclick="closeSidebar()"></div>
+
+  <!-- ══ SHELL ══ -->
+  <aside id="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-mark">Live Agents</div>
+      <div class="sb-logo-sub">DiViA Live Agent Service</div>
+    </div>
+    <div class="sb-search">
+      <input type="text" id="sb-search-in" placeholder="🔍  Search modules..." oninput="filterNav(this.value)">
+    </div>
+    <nav class="sb-nav" id="sb-nav"></nav>
+    <div class="sb-footer">
+      <span class="sb-footer-txt">Property of DigitalSolution · v3.1</span>
+      <div class="status-pip"></div>
+    </div>
+  </aside>
+
+  <div id="right-col">
+
+    <!-- TOPBAR -->
+    <div id="topbar">
+      <div class="tb-left">
+        <div class="tb-menu" onclick="toggleSidebar()">☰</div>
+        <div>
+          <div class="tb-brand-name">DigitalSolution 🇳🇬</div>
+          <div class="tb-breadcrumb">
+            <span>Hub</span>
+            <span class="tb-bc-sep">›</span>
+            <span class="tb-bc-cur" id="bc-cur">goSHOPs · ViShA</span>
+          </div>
+        </div>
+      </div>
+      <div class="tb-right">
+        <div class="wallet-chip">
+          <span class="wallet-lbl">WALLET</span>
+          <span class="wallet-amt">₦***.00</span>
+        </div>
+        <div class="live-badge">● LIVE</div>
+      </div>
+    </div>
+
+    <!-- MODULE IFRAME PANEL -->
+    <div id="module-host" style="display:none;flex:1;position:relative;overflow:hidden;background:#080809;">
+      <div id="module-loading"
+        style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;gap:14px;">
+        <div style="font-size:2.4rem;" id="module-load-icon">🔄</div>
+        <div
+          style="font-family:'Cinzel',serif;font-size:0.85rem;letter-spacing:3px;background:linear-gradient(130deg,#D4AF37,#F9E29C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"
+          id="module-load-name">Loading…</div>
+        <div style="width:48px;height:3px;border-radius:2px;background:rgba(212,175,55,0.15);overflow:hidden;">
+          <div
+            style="height:100%;width:40%;background:var(--gold);border-radius:2px;animation:moduleBar 1.2s ease-in-out infinite alternate;">
+          </div>
+        </div>
+      </div>
+      <iframe id="module-iframe" style="width:100%;height:100%;border:none;opacity:0;transition:opacity 0.4s;"
+        allow="fullscreen" onload="onModuleLoad()" src="about:blank">
+      </iframe>
+    </div>
+
+    <!-- VISHA APP HOST -->
+    <div id="visha-host">
+      <div class="chat-window">
+        <div class="header">
+          <div class="bot-avatar">🛒</div>
+          <div class="header-info">
+            <div class="header-name">ViShA Shopper</div>
+            <div class="header-status">
+              <div class="status-dot"></div>Online · Ready to take orders.
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="hbtn" onclick="openOverlay('overlayAddStore')" title="Join Vendors">🏪</button>
+            <button class="hbtn" onclick="openCart()" title="Cart">🛒</button>
+            <button class="hbtn" onclick="openSearch()" title="Search">🔍</button>
+          </div>
+        </div>
+        <div class="mall-banner" id="mallBanner">
+          🏬 <span id="mallBannerText"></span>
+          <span style="margin-left:auto;font-size:11px;cursor:pointer;text-decoration:underline;"
+            onclick="changeMall()">Change</span>
+        </div>
+        <div class="messages" id="messages"></div>
+        <div class="input-area">
+          <div class="input-box">
+            <textarea class="chat-input" id="chatInput" rows="1"
+              placeholder="Type a message or choose an option above..."></textarea>
+          </div>
+          <button class="send-btn" onclick="sendUserMsg()">➤</button>
+        </div>
+      </div>
+
+      <!-- ══════════════════ ORIGINAL OVERLAYS ══════════════════ -->
+
+      <!-- QUANTITY CONFIRM SHEET -->
+      <div class="overlay" id="overlayQtyConfirm">
+        <div class="sheet qty-confirm-sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">🛒 Add to Cart</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayQtyConfirm')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div class="qcs-product">
+              <div class="qcs-emoji" id="qcsEmoji"
+                style="overflow:hidden;border-radius:12px;background:var(--surface2);">
+                <img id="qcsImg" src="" alt="" style="width:52px;height:52px;object-fit:cover;display:block;"
+                  onerror="this.style.display='none';document.getElementById('qcsEmojiText').style.display='flex'">
+                <div id="qcsEmojiText"
+                  style="display:none;width:52px;height:52px;align-items:center;justify-content:center;font-size:26px;background:var(--surface2);">
+                  📦</div>
+              </div>
+              <div>
+                <div class="qcs-name" id="qcsName">Product</div>
+                <div class="qcs-price" id="qcsPrice">₦0</div>
+                <div class="qcs-store" id="qcsStore">Store</div>
+              </div>
+            </div>
+            <div class="qcs-qty-row">
+              <div class="qcs-qty-label">Quantity</div>
+              <div class="qcs-stepper">
+                <button class="qcs-btn" onclick="qcsChange(-1)">−</button>
+                <div class="qcs-count" id="qcsCount">1</div>
+                <button class="qcs-btn" onclick="qcsChange(1)">+</button>
+              </div>
+            </div>
+            <div class="qcs-subtotal">
+              <div class="qcs-subtotal-label">Subtotal</div>
+              <div class="qcs-subtotal-val" id="qcsSubtotal">₦0</div>
+            </div>
+          </div>
+          <div class="sheet-footer">
+            <button class="wa-btn" onclick="confirmAddToCart()">✅ Add to Cart</button>
+            <button class="wa-btn wa-btn-ghost" style="margin-top:8px;"
+              onclick="closeOverlay('overlayQtyConfirm')">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CART SHEET -->
+      <div class="overlay" id="overlayCart">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">🛒 My Cart</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayCart')">✕</div>
+          </div>
+          <div class="sheet-body" id="cartBody"></div>
+          <div class="sheet-footer" id="cartFooter"></div>
+        </div>
+      </div>
+
+      <!-- SEARCH SHEET -->
+      <div class="overlay" id="overlaySearch">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">🔍 Search Products</div>
+            <div class="sheet-close" onclick="closeOverlay('overlaySearch')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <input class="form-input" id="searchInput" placeholder="Search products, brands, categories..."
+              oninput="liveSearch(this.value)" style="margin-bottom:12px;" autofocus>
+            <div id="searchResults"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER SHEET -->
+      <div class="overlay" id="overlayOrder">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">📦 Place Your Order</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayOrder')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="oName"
+                placeholder="Your full name"></div>
+            <div class="form-group"><label class="form-label">Phone / WhatsApp</label><input class="form-input"
+                id="oPhone" type="tel" placeholder="+234 800 000 0000"></div>
+            <div class="form-group"><label class="form-label">Delivery Address</label><textarea class="form-textarea"
+                id="oAddress" placeholder="Share WhatsApp location or enter area, street or landmark."></textarea></div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">City</label><input class="form-input" id="oCity"
+                  placeholder="Abuja"></div>
+              <div class="form-group"><label class="form-label">State</label>
+                <select class="form-select" id="oState">
+                  <option>Abuja (FCT)</option>
+                  <option>Lagos</option>
+                  <option>Rivers</option>
+                  <option>Kano</option>
+                  <option>Abia</option>
+                  <option>Ogun</option>
+                  <option>Kaduna</option>
+                  <option>Delta</option>
+                  <option>Enugu</option>
+                  <option>Plateau</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">Payment Method</label>
+              <select class="form-select" id="oPayment">
+                <option>Bank Transfer</option>
+                <option>USSD</option>
+                <option>Card Payment</option>
+                <option>goCOINS Token (GCDT)</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Special Instructions</label><textarea
+                class="form-textarea" id="oNotes" placeholder="Gift wrap, colour preference, size..."></textarea></div>
+          </div>
+          <div class="sheet-footer"><button class="wa-btn" onclick="submitOrder()">📲 Confirm Order via
+              WhatsApp</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRACK SHEET -->
+      <div class="overlay" id="overlayTrack">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">🚚 Track My Order</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayTrack')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div class="form-group"><label class="form-label">Order ID or Phone Number</label><input class="form-input"
+                id="trackId" placeholder="e.g. SB-20240318 or +234..."></div>
+            <div
+              style="font-size:12px;color:var(--text-muted);line-height:1.6;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;">
+              📍 You'll be redirected to WhatsApp where our team will give you a real-time status update.
+            </div>
+          </div>
+          <div class="sheet-footer"><button class="wa-btn" onclick="submitTrack()">📲 Track via WhatsApp</button></div>
+        </div>
+      </div>
+
+      <!-- SUPPORT SHEET -->
+      <div class="overlay" id="overlaySupport">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">🎧 Customer Support</div>
+            <div class="sheet-close" onclick="closeOverlay('overlaySupport')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" id="sName"
+                placeholder="Full name"></div>
+            <div class="form-group"><label class="form-label">Issue Type</label>
+              <select class="form-select" id="sType">
+                <option>Order not received</option>
+                <option>Wrong item delivered</option>
+                <option>Damaged product</option>
+                <option>Refund request</option>
+                <option>Payment issue</option>
+                <option>General inquiry</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Order ID (if applicable)</label><input class="form-input"
+                id="sOrder" placeholder="SB-20240318"></div>
+            <div class="form-group"><label class="form-label">Describe Your Issue</label><textarea class="form-textarea"
+                id="sDesc" placeholder="Tell us what happened..."></textarea></div>
+          </div>
+          <div class="sheet-footer"><button class="wa-btn" onclick="submitSupport()">📲 Contact Support via
+              WhatsApp</button></div>
+        </div>
+      </div>
+
+      <!-- RETURN SHEET -->
+      <div class="overlay" id="overlayReturn">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">↩️ Return & Refund</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayReturn')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div class="form-group"><label class="form-label">Order ID</label><input class="form-input" id="rOrder"
+                placeholder="SB-20240318"></div>
+            <div class="form-group"><label class="form-label">Item to Return</label><input class="form-input" id="rItem"
+                placeholder="Product name"></div>
+            <div class="form-group"><label class="form-label">Reason for Return</label>
+              <select class="form-select" id="rReason">
+                <option>Wrong Size/Color/Type</option>
+                <option>Defective product</option>
+                <option>Not as described</option>
+                <option>Changed my mind</option>
+                <option>Received wrong item</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">Preferred Resolution</label>
+              <select class="form-select" id="rResolution">
+                <option>Split Refund</option>
+                <option>Exchange/Replacement</option>
+                <option>Store Credit</option>
+              </select>
+            </div>
+          </div>
+          <div class="sheet-footer"><button class="wa-btn" onclick="submitReturn()">📲 Submit Return via
+              WhatsApp</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BULK / RFQ SHEET -->
+      <div class="overlay" id="overlayRFQ">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">📋 Bulk / Wholesale Request</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayRFQ')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div class="form-group"><label class="form-label">Name / Company</label><input class="form-input" id="bName"
+                placeholder="Full name or company"></div>
+            <div class="form-group"><label class="form-label">Product(s) Needed</label><textarea class="form-textarea"
+                id="bProduct" placeholder="Describe products and specifications..."></textarea></div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Quantity</label><input class="form-input" id="bQty"
+                  type="number" placeholder="500 units"></div>
+              <div class="form-group"><label class="form-label">Budget</label><input class="form-input" id="bBudget"
+                  placeholder="₦200,000"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Delivery Location</label><input class="form-input"
+                id="bLocation" placeholder="City, State"></div>
+          </div>
+          <div class="sheet-footer"><button class="wa-btn" onclick="submitBulk()">📲 Send Bulk Request via
+              WhatsApp</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRICE ALERT SHEET -->
+      <div class="overlay" id="overlayAlert">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">🔔 Set Price Alert</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayAlert')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div class="form-group"><label class="form-label">Product Name</label><input class="form-input"
+                id="alProduct" placeholder="e.g. iPhone 15 Pro Max"></div>
+            <div class="form-group"><label class="form-label">Your Target Price (₦)</label><input class="form-input"
+                id="alPrice" type="number" placeholder="750000"></div>
+            <div class="form-group"><label class="form-label">Your WhatsApp Number</label><input class="form-input"
+                id="alPhone" type="tel" placeholder="+234 800 000 0000"></div>
+            <div class="form-group"><label class="form-label">Alert Condition</label>
+              <select class="form-select" id="alWhen">
+                <option>Price drops to my target</option>
+                <option>Price drops by 10%+</option>
+                <option>Any price drop</option>
+                <option>Item back in stock</option>
+              </select>
+            </div>
+          </div>
+          <div class="sheet-footer"><button class="wa-btn" onclick="submitAlert()">📲 Set Alert via WhatsApp</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVIEW SHEET -->
+      <div class="overlay" id="overlayReview">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">⭐ Leave a Review</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayReview')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" id="rvName"
+                placeholder="Full name"></div>
+            <div class="form-group"><label class="form-label">Product / Store</label><input class="form-input"
+                id="rvProduct" placeholder="What are you reviewing?"></div>
+            <div class="form-group"><label class="form-label">Rating</label>
+              <div style="display:flex;gap:10px;margin-top:6px;">
+                <span class="star-btn" style="font-size:28px;cursor:pointer;" onclick="setStar(1)">⭐</span>
+                <span class="star-btn" style="font-size:28px;cursor:pointer;" onclick="setStar(2)">⭐</span>
+                <span class="star-btn" style="font-size:28px;cursor:pointer;" onclick="setStar(3)">⭐</span>
+                <span class="star-btn" style="font-size:28px;cursor:pointer;" onclick="setStar(4)">⭐</span>
+                <span class="star-btn" style="font-size:28px;cursor:pointer;" onclick="setStar(5)">⭐</span>
+              </div>
+              <input type="hidden" id="rvStars" value="5">
+            </div>
+            <div class="form-group"><label class="form-label">Your Review</label><textarea class="form-textarea"
+                id="rvText" placeholder="Share your experience..."></textarea></div>
+          </div>
+          <div class="sheet-footer"><button class="wa-btn" onclick="submitReview()">📲 Submit Review via
+              WhatsApp</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPARE SHEET -->
+      <div class="overlay" id="overlayCompare">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">⚖️ Compare Products</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayCompare')">✕</div>
+          </div>
+          <div class="sheet-body" id="compareBody"></div>
+          <div class="sheet-footer"><button class="wa-btn" onclick="submitCompare()">📲 Ask on WhatsApp for
+              Recommendation</button></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════
+     ADD MY STORE — MULTI-STEP OVERLAY
+     ══════════════════════════════════════════════════════════ -->
+      <div class="overlay" id="overlayAddStore">
+        <div class="sheet" style="max-height:92vh;">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">🏪 Join Vendors</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayAddStore');resetStoreReg()">✕</div>
+          </div>
+          <div class="sheet-body" id="addStoreBody">
+            <!-- Step content injected by JS -->
+          </div>
+          <div class="sheet-footer" id="addStoreFooter"></div>
+        </div>
+      </div>
+
+      <!-- STORE DASHBOARD OVERLAY -->
+      <div class="overlay" id="overlayStoreDash">
+        <div class="sheet" style="max-height:92vh;">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title" id="dashTitle">🏪 My Store</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayStoreDash')">✕</div>
+          </div>
+          <div class="sheet-body" id="storeDashBody"></div>
+          <div class="sheet-footer" id="storeDashFooter"></div>
+        </div>
+      </div>
+
+      <!-- ADD PRODUCT OVERLAY -->
+      <div class="overlay" id="overlayAddProduct">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">➕ Add Product</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayAddProduct')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div class="form-group"><label class="form-label">Product Name *</label><input class="form-input"
+                id="ap_name" placeholder="e.g. Handmade Leather Bag"></div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Price (₦) *</label><input class="form-input"
+                  id="ap_price" type="number" placeholder="25000"></div>
+              <div class="form-group"><label class="form-label">Category *</label>
+                <select class="form-select" id="ap_cat">
+                  <option value="">Select…</option>
+                  <option>📺Electronics & Appliances</option>
+                  <option>🥗Food & Groceries</option>
+                  <option>👗Clothings & Fabrics</option>
+                  <option>🍾Drinks & Juice</option>
+                  <option>⌚Watches & Jewelries</option>
+                  <option>🥾Shoes & Footwares</option>
+                  <option>📱Phones & Tablets</option>
+                  <option>📚Books & Education</option>
+                  <option>🖥️Computer & Laptops</option>
+                  <option>🎮Gadgets & Gears</option>
+                  <option>💊Medicine & Healthcare</option>
+                  <option>🌶️Seasoning & Spices</option>
+                  <option>🍉Vegitables & Fruits</option>
+                  <option>🖼️Art & Crafts</option>
+                  <option>🌳Plants & Nature</option>
+                  <option>🛋️Furnitures & Decors</option>
+                  <option>💊Medicine & Healthcare</option>
+                  <option>💄Cosmetics & Beauty</option>
+                  <option>⚡️ Bills & Utility</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Emoji Icon</label><input class="form-input"
+                  id="ap_emoji" placeholder="🛍️" maxlength="2"></div>
+              <div class="form-group"><label class="form-label">Badge</label>
+                <select class="form-select" id="ap_badge">
+                  <option value="">None</option>
+                  <option value="new">NEW</option>
+                  <option value="hot">HOT</option>
+                  <option value="sale">SALE</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea"
+                id="ap_desc" placeholder="Describe your product..." style="min-height:60px;"></textarea></div>
+            <div class="form-group"><label class="form-label">Stock Quantity</label><input class="form-input"
+                id="ap_stock" type="number" placeholder="50"></div>
+          </div>
+          <div class="sheet-footer">
+            <div id="apQuotaWarn" style="display:none;margin-bottom:10px;"></div>
+            <button class="store-btn" onclick="submitAddProduct()">✅ Add Product to My Store</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CSV BULK UPLOAD OVERLAY -->
+      <div class="overlay" id="overlayCSVUpload">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">📂 Bulk Upload via CSV</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayCSVUpload')">✕</div>
+          </div>
+          <div class="sheet-body" id="csvUploadBody">
+            <!-- injected by JS based on PIN status -->
+          </div>
+          <div class="sheet-footer" id="csvUploadFooter"></div>
+        </div>
+      </div>
+
+      <!-- BUY PIN OVERLAY -->
+      <div class="overlay" id="overlayBuyPin">
+        <div class="sheet">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title">🔑 Purchase Upload PIN</div>
+            <div class="sheet-close" onclick="closeOverlay('overlayBuyPin')">✕</div>
+          </div>
+          <div class="sheet-body">
+            <div style="text-align:center;padding:10px 0 18px;">
+              <div style="font-size:44px;margin-bottom:10px;">🔑</div>
+              <div style="font-size:15px;font-weight:800;margin-bottom:6px;">Unlock Unlimited Products</div>
+              <div style="font-size:12.5px;color:var(--text-muted);line-height:1.6;max-width:280px;margin:0 auto;">
+                You've reached the <strong>10 free products</strong> limit. Purchase an Upload PIN to import unlimited
+                products via CSV.
+              </div>
+              <div
+                style="margin:16px auto;background:var(--store-light);border:1.5px solid rgba(108,99,255,0.25);border-radius:14px;padding:14px;max-width:260px;">
+                <div
+                  style="font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;">
+                  Upload PIN Price</div>
+                <div style="font-size:28px;font-weight:800;color:var(--store);margin:5px 0;">₦5,000</div>
+                <div style="font-size:11.5px;color:var(--text-muted);">One-time payment · Unlimited CSV uploads</div>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="ic-row">
+                <div class="ic-icon">✅</div>
+                <div class="ic-text">Upload unlimited products via CSV</div>
+              </div>
+              <div class="ic-row">
+                <div class="ic-icon">✅</div>
+                <div class="ic-text">Bulk edit up to 500 products at once</div>
+              </div>
+              <div class="ic-row">
+                <div class="ic-icon">✅</div>
+                <div class="ic-text">Priority listing in search results</div>
+              </div>
+              <div class="ic-row">
+                <div class="ic-icon">✅</div>
+                <div class="ic-text">Store analytics dashboard access</div>
+              </div>
+              <div class="ic-row">
+                <div class="ic-icon">✅</div>
+                <div class="ic-text">PIN delivered instantly via WhatsApp</div>
+              </div>
+            </div>
+          </div>
+          <div class="sheet-footer">
+            <button class="wa-btn" onclick="buyPinViaWA()">📲 Pay ₦5,000 & Get PIN via WhatsApp</button>
+            <button class="wa-btn wa-btn-ghost" style="margin-top:8px;" onclick="closeOverlay('overlayBuyPin')">←
+              Back</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /right-col -->
+
+  <!-- WA MODAL -->
+  <div id="wa-modal">
+    <div class="wa-card">
+      <div class="wa-title">ENCRYPTING DATA</div>
+      <div class="wa-sub">Connecting to secure WhatsApp node…</div>
+      <div class="wa-count" id="wa-timer">3</div>
+      <div class="wa-app" id="wa-app-name"></div>
+    </div>
+  </div>
+
+  <!-- ══ DASHBOARD NAV SCRIPT ══ -->
+  <script>
+    (function () {
+      'use strict';
+      var WA = "2348157505037";
+
+      var NAV = [
+        {
+          icon: "🛒", label: "goSHOPs · ViShA", tag: "Smart Shopping",
+          subs: [
+            { label: "Global Mall", icon: "🌐", href: null },
+            { label: "Flash Sales", icon: "⚡", href: null },
+            { label: "Order Tracking", icon: "📦", href: null },
+            { label: "Vendor Portal", icon: "🏪", href: null },
+            { label: "Merchant Tools", icon: "🛠", href: null }
+          ]
+        },
+        {
+          icon: "🥗", label: "goCHOPS", tag: "Food & Meals",
+          subs: [
+            { label: "Order Breakfast", icon: "🌅", href: "https://techbydigitalsolution.com/%f0%9f%a5%97goCHOPS/" },
+            { label: "Lunch Packs", icon: "🍱", href: "https://techbydigitalsolution.com/%f0%9f%a5%97goCHOPS/" },
+            { label: "Dinner Packages", icon: "🍽", href: "https://techbydigitalsolution.com/%f0%9f%a5%97goCHOPS/" },
+            { label: "Order Swallow", icon: "🥣", href: "https://techbydigitalsolution.com/%f0%9f%a5%97goCHOPS/" },
+            { label: "Kitchen Dashboard", icon: "👨‍🍳", href: "https://techbydigitalsolution.com/%f0%9f%a5%97goCHOPS/" }
+          ]
+        },
+        {
+          icon: "🚌", label: "goMETRO", tag: "Bus & Travel",
+          subs: [
+            { label: "Bus Booking", icon: "🎫", href: "https://techbydigitalsolution.com/🛺goALLRIDEs.html" },
+            { label: "Flight Tickets", icon: "✈️", href: "https://techbydigitalsolution.com/🛺goALLRIDEs.html" },
+            { label: "Train Schedule", icon: "🚂", href: "https://techbydigitalsolution.com/🛺goALLRIDEs.html" },
+            { label: "Route Maps", icon: "🗺", href: "https://techbydigitalsolution.com/🛺goALLRIDEs.html" },
+            { label: "Travel Insurance", icon: "🛡", href: "https://techbydigitalsolution.com/🛺goALLRIDEs.html" }
+          ]
+        },
+        {
+          icon: "🛺", label: "goRIDEs", tag: "Ride Hailing",
+          subs: [
+            { label: "Request Ride", icon: "📍", href: "https://techbydigitalsolution.com/🛺goALLRIDEs.html" },
+            { label: "Package Dispatch", icon: "📬", href: "#" },
+            { label: "Ride History", icon: "🕓", href: "https://techbydigitalsolution.com/🛺goALLRIDEs.html" },
+            { label: "Safety Settings", icon: "🔒", href: "https://techbydigitalsolution.com/🛺goALLRIDEs.html" },
+            { label: "Become a Rider", icon: "🏍", href: "https://techbydigitalsolution.com/🛺goALLRIDEs.html" }
+          ]
+        },
+        {
+          icon: "🎓", label: "goCBT", tag: "Exams & Study",
+          subs: [
+            { label: "Mock Exams", icon: "📝", href: "https://techbydigitalsolution.com/%F0%9F%8E%93goCBT/%F0%9F%93%9AeCampus.html" },
+            { label: "Study Materials", icon: "📚", href: "https://techbydigitalsolution.com/%F0%9F%8E%93goCBT/%F0%9F%93%9AeCampus.html" },
+            { label: "Result Checking", icon: "📊", href: "https://techbydigitalsolution.com/%F0%9F%8E%93goCBT/%F0%9F%93%9AeCampus.html" },
+            { label: "Tutor Match", icon: "👨‍🏫", href: "https://techbydigitalsolution.com/%F0%9F%8E%93goCBT/%F0%9F%93%9AeCampus.html" },
+            { label: "Institution Search", icon: "🏫", href: "https://techbydigitalsolution.com/%F0%9F%8E%93goCBT/%F0%9F%93%9AeCampus.html" }
+          ]
+        },
+        {
+          icon: "🚑", label: "goMEDIC", tag: "Health & Emergency",
+          subs: [
+            { label: "Emergency SOS", icon: "🆘", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" },
+            { label: "Book Appointment", icon: "📅", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" },
+            { label: "Pharmacy", icon: "💊", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" },
+            { label: "Teleconsultation", icon: "💬", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" },
+            { label: "Medical Reports", icon: "📂", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" }
+          ]
+        },
+        {
+          icon: "💼", label: "Remote.Workr™", tag: "Remote workplace",
+          subs: [
+            { label: "Apply Permit", icon: "📝", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" },
+            { label: "Book Appointment", icon: "📅", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" },
+            { label: "Pharmacy", icon: "💊", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" },
+            { label: "Teleconsultation", icon: "💬", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" },
+            { label: "Medical Reports", icon: "📂", href: "https://www.techbydigitalsolution.com/%F0%9F%9A%91goMEDIC/goMEDIC.html" }
+          ]
+        },
+        {
+          icon: "⛽", label: "Gas Refill", tag: "Cooking Gas",
+          subs: [
+            { label: "Instant Refill", icon: "🔥", href: "#" },
+            { label: "Cylinder Exchange", icon: "🔄", href: "#" },
+            { label: "Safety Checkup", icon: "✅", href: "#" },
+            { label: "Refill History", icon: "🕓", href: "#" },
+            { label: "Subscription Plan", icon: "♻", href: "#" }
+          ]
+        },
+        {
+          icon: "🛠️", label: "iFIX", tag: "Device Repairs",
+          subs: [
+            { label: "Repair Phone/Tablet", icon: "🔥", href: "#" },
+            { label: "Fix Laptop", icon: "🔄", href: "#" },
+            { label: "Secure Device", icon: "✅", href: "#" },
+            { label: "Device Control", icon: "🕓", href: "#" },
+            { label: "Pickup/Delivery", icon: "♻", href: "#" }
+          ]
+        },
+        {
+          icon: "🛠️", label: "MyPASS", tag: "Access Control",
+          subs: [
+            { label: "Create Pass", icon: "🔥", href: "#" },
+            { label: "Check-In", icon: "🔄", href: "#" },
+            { label: "Check Out", icon: "✅", href: "#" },
+            { label: "Add Organisation", icon: "🕓", href: "#" },
+            { label: "History", icon: "♻", href: "#" }
+          ]
+        }
+
+      ];
+
+      var activeSubEl = null;
+
+      function buildNav(data) {
+        var nav = document.getElementById('sb-nav');
+        nav.innerHTML = '';
+        data.forEach(function (cat, ci) {
+          var g = document.createElement('div');
+          g.className = 'nav-cat';
+          g.style.animationDelay = (ci * 0.05) + 's';
+
+          var hdr = document.createElement('div');
+          hdr.className = 'nav-cat-hdr' + (ci === 0 ? ' open active-cat' : '');
+          hdr.innerHTML = '<span class="nch-icon">' + cat.icon + '</span><span class="nch-label">' + cat.label + '</span><span class="nch-arrow">▾</span>';
+          hdr.onclick = function () { toggleCat(hdr); };
+
+          var sub = document.createElement('div');
+          sub.className = 'nav-sub' + (ci === 0 ? ' open' : '');
+
+          cat.subs.forEach(function (s, si) {
+            var item = document.createElement('div');
+            item.className = 'nav-sub-item' + (ci === 0 && si === 0 ? ' active' : '');
+            var badge = s.href ? '<span class="sub-badge">↗ LINK</span>' : '';
+            item.innerHTML = '<span class="nav-sub-dot"></span><span>' + s.icon + ' ' + s.label + '</span>' + badge;
+            item.onclick = (function (ci2, si2, s2, cat2) {
+              return function () { activateSub(ci2, si2, item, cat2, s2); };
+            })(ci, si, s, cat);
+            sub.appendChild(item);
+            if (ci === 0 && si === 0) activeSubEl = item;
+          });
+
+          g.appendChild(hdr); g.appendChild(sub);
+          nav.appendChild(g);
+        });
+      }
+
+      function toggleCat(hdr) {
+        var sub = hdr.nextElementSibling;
+        var isOpen = sub.classList.contains('open');
+        document.querySelectorAll('.nav-sub').forEach(function (s) { s.classList.remove('open'); });
+        document.querySelectorAll('.nav-cat-hdr').forEach(function (h) { h.classList.remove('open', 'active-cat'); });
+        if (!isOpen) { sub.classList.add('open'); hdr.classList.add('open', 'active-cat'); }
+      }
+
+      function activateSub(ci, si, el, cat, sub) {
+        if (activeSubEl) activeSubEl.classList.remove('active');
+        el.classList.add('active'); activeSubEl = el;
+        document.getElementById('bc-cur').textContent = cat.label + ' › ' + sub.label;
+        closeSidebar();
+
+        if (ci === 0) {
+          // goSHOPs — show ViShA, hide iframe
+          showViShA();
+          return;
+        }
+
+        if (sub.href) {
+          loadModuleURL(sub.href, sub.icon + ' ' + sub.label, sub.icon);
+        } else {
+          triggerWA(sub.label, '🚀 *goAPPs REQUEST*\nModule: ' + cat.label + '\nService: ' + sub.label + '\nStatus: Activation Required');
+        }
+      }
+
+      // ── Module iframe helpers ──
+      function loadModuleURL(url, name, icon) {
+        var host = document.getElementById('module-host');
+        var vhost = document.getElementById('visha-host');
+        var iframe = document.getElementById('module-iframe');
+        var loadEl = document.getElementById('module-loading');
+        var nameEl = document.getElementById('module-load-name');
+        var iconEl = document.getElementById('module-load-icon');
+
+        // Show module panel, hide ViShA
+        vhost.style.display = 'none';
+        host.style.display = 'flex';
+        host.style.flexDirection = 'column';
+
+        // Reset iframe & show loader
+        iframe.style.opacity = '0';
+        loadEl.style.display = 'flex';
+        nameEl.textContent = name;
+        iconEl.textContent = icon || '🔄';
+        iframe.src = url;
+      }
+
+      window.onModuleLoad = function () {
+        var iframe = document.getElementById('module-iframe');
+        var loadEl = document.getElementById('module-loading');
+        iframe.style.opacity = '1';
+        loadEl.style.display = 'none';
+      };
+
+      function showViShA() {
+        var host = document.getElementById('module-host');
+        var vhost = document.getElementById('visha-host');
+        var iframe = document.getElementById('module-iframe');
+        host.style.display = 'none';
+        vhost.style.display = 'flex';
+        iframe.src = 'about:blank';
+      }
+
+      window.filterNav = function (q) {
+        q = q.toLowerCase().trim();
+        if (!q) { buildNav(NAV); return; }
+        var f = NAV.map(function (c) {
+          var subs = c.subs.filter(function (s) { return s.label.toLowerCase().includes(q) || c.label.toLowerCase().includes(q); });
+          return subs.length ? Object.assign({}, c, { subs: subs }) : null;
+        }).filter(Boolean);
+        buildNav(f);
+        document.querySelectorAll('.nav-cat-hdr').forEach(function (h) { h.classList.add('open', 'active-cat'); h.nextElementSibling.classList.add('open'); });
+      };
+
+      function triggerWA(appName, message) {
+        var modal = document.getElementById('wa-modal');
+        var timerEl = document.getElementById('wa-timer');
+        var nameEl = document.getElementById('wa-app-name');
+        modal.style.display = 'flex';
+        nameEl.textContent = appName.toUpperCase();
+        var count = 3;
+        var iv = setInterval(function () {
+          count--;
+          timerEl.textContent = count;
+          if (count <= 0) {
+            clearInterval(iv);
+            window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(message), '_blank');
+            modal.style.display = 'none';
+            timerEl.textContent = '3';
+          }
+        }, 1000);
+      }
+
+      window.toggleSidebar = function () {
+        var sb = document.getElementById('sidebar');
+        if (window.innerWidth <= 768) {
+          sb.classList.toggle('mob-open');
+          document.getElementById('mob-overlay').classList.toggle('active');
+        } else {
+          sb.classList.toggle('collapsed');
+        }
+      };
+      window.closeSidebar = function () {
+        document.getElementById('sidebar').classList.remove('mob-open');
+        document.getElementById('mob-overlay').classList.remove('active');
+      };
+
+      buildNav(NAV);
+    })();
+  </script>
+
+  <!-- ViShA original scripts -->
+  <script>
+
+    // ════════════════════════════════
+    // CONFIG
+    // ════════════════════════════════
+    const WA = '2348157505037';
+
+    // ════════════════════════════════
+    // DATA
+    // ════════════════════════════════
+    const malls = [
+      { id: 'EA', emoji: '📺', name: 'Electronics & Appliances', loc: 'Global', tag: '2,430k+ Products', stores: 1342 },
+      { id: 'FG', emoji: '🥗', name: 'Food & Groceries', loc: 'Global', tag: '17,342k+ products', stores: 5740 },
+      { id: 'CF', emoji: '👗', name: 'Clothings & Fabrics', loc: 'Global', tag: '1,367k+ products', stores: 965 },
+      { id: 'DJ', emoji: '🍾', name: 'Drinks & Juice', loc: 'Global', tag: '31,367k+ products', stores: 22261 },
+      { id: 'WJ', emoji: '⌚', name: 'Watches & Jewelries', loc: 'Global', tag: '2,769k+ products', stores: 1830 },
+      { id: 'SF', emoji: '🥾', name: 'Shoes & Footwares', loc: 'Global', tag: '1,937k+ products', stores: 8355 },
+      { id: 'PT', emoji: '📱', name: 'Phones & Tablets', loc: 'Global', tag: '4,821k+ products', stores: 3225 },
+      { id: 'CL', emoji: '🖥️', name: 'Computer & Laptops', loc: 'Global', tag: '2,278k+ products', stores: 5972 },
+      { id: 'GG', emoji: '🎮', name: 'Gadgets & Gears', loc: 'Global', tag: '3,728k+ products', stores: 3925 },
+      { id: 'VF', emoji: '🍉', name: 'Vegetables & Fruits', loc: 'Global', tag: '3,728k+ products', stores: 1720 },
+      { id: 'SS', emoji: '🌶️', name: 'Seasoning & Spices', loc: 'Global', tag: '3,728k+ products', stores: 3925 },
+      { id: 'MH', emoji: '💊', name: 'Medicine & Healthcare', loc: 'Global', tag: '4,623k+ products', stores: 325 },
+      { id: 'AC', emoji: '🖼️', name: 'Art & Crafts', loc: 'Global', tag: '2,738k+ products', stores: 3261 },
+      { id: 'PN', emoji: '🌳', name: 'Plants & Nature', loc: 'Global', tag: '735k+ products', stores: 8732 },
+      { id: 'FD', emoji: '🛋️', name: 'Furnitures & Decors', loc: 'Global', tag: '4739k+ products', stores: 6328 },
+      { id: 'CB', emoji: '💄', name: 'Cosmetics & Beauty', loc: 'Global', tag: '2791k+ products', stores: 6201 },
+      { id: 'BU', emoji: '⚡️', name: 'Bills & Utility', loc: 'Global', tag: 'Electricity, Data, Airtime, coins', stores: 2201 },
+      { id: 'GC', emoji: '💰', name: 'goCOINS Shopper Token', loc: 'Global', tag: 'Only 310 remaining', stores: 201 },
+    ];
+
+    const products = [
+
+      //====(PT) PHONES & TABS
+      { id: 'E1', emoji: '📱', name: 'Samsung Galaxy A55', store: 'TechZone', price: '₦289,000', num: 289000, cat: 'Electronics', mall: 'PT', badge: 'hot', rating: 4.7 },
+
+
+      //====== (CL) COMPUTERS & LAPI
+      { id: 'E2', emoji: '💻', name: 'HP Laptop 15" i5', store: 'CompuWorld', price: '₦520,000', num: 520000, cat: 'Electronics', mall: 'CL', badge: '', rating: 4.5 },
+      { id: 'HP', emoji: '🧴', name: 'HP Envy 2.0 (24)', store: 'BeautyDistrib', price: '₦96,000', num: 96000, cat: 'Wholesale', mall: 'CL', badge: 'sale', rating: 4.4 },
+      { id: 'W1', emoji: '📦', name: 'Rice 50kg x10 Bags', store: 'WholesaleKing', price: '₦185,000', num: 185000, cat: 'Wholesale', mall: 'FG', badge: 'hot', rating: 4.6 },
+
+
+
+      //== (EA) ELECTRONICS ===
+      { id: 'E4', emoji: '📺', name: 'LG 43" Smart TV', store: 'ChiefDaddy Stores', price: '₦380,000', num: 380000, cat: 'Electronics', mall: 'EA', badge: 'new', rating: 4.6 },
+
+
+
+      //=== (GG) GADGETS
+      { id: 'E5', emoji: '⌚', name: 'Smart Watch Pro', store: 'TechZone', price: '₦68,000', num: 68000, cat: 'Electronics', mall: 'GG', badge: 'hot', rating: 4.4 },
+      { id: 'E6', emoji: '📸', name: 'Canon DSLR Camera', store: 'PhotoWorld', price: '₦420,000', num: 420000, cat: 'Electronics', mall: 'GG', badge: '', rating: 4.7 },
+      { id: 'E3', emoji: '🎧', name: 'JBL Wireless Earbuds', store: 'SoundHouse', price: '₦45,000', num: 45000, cat: 'Electronics', mall: 'GG', badge: 'sale', rating: 4.8 },
+
+
+      //====(CF) CLOTHING & FASHION
+      { id: 'F1', emoji: '👗', name: 'Designer Ankara Dress', store: 'AfriqueStyle', price: '₦18,500', num: 18500, cat: 'Fashion', mall: 'CF', badge: 'new', rating: 4.9 },
+      { id: 'F4', emoji: '🧥', name: 'Men\'s 3-Piece Suit', store: 'DapperMan', price: '₦85,000', num: 85000, cat: 'Fashion', mall: 'CF', badge: 'sale', rating: 4.7 },
+      { id: 'F4', emoji: '🧥', name: 'Men\'s 3-Piece Suit', store: 'DapperMan', price: '₦85,000', num: 85000, cat: 'Fashion', mall: 'CF', badge: 'sale', rating: 4.7 },
+      { id: 'F5', emoji: '👒', name: 'Handwoven Adire Set', store: 'AfriqueStyle', price: '₦22,000', num: 22000, cat: 'Fashion', mall: 'CF', badge: 'new', rating: 4.9 },
+
+
+      //=== (SF) SHOES & FOOTWARE
+      { id: 'F2', emoji: '👟', name: 'Nike Air Force 1', store: 'SneakerHub', price: '₦95,000', num: 95000, cat: 'Fashion', mall: 'SF', badge: 'hot', rating: 4.8 },
+
+
+      //=== (WJ) WATCHES & JEWELRIES
+      { id: 'F3', emoji: '👜', name: 'Leather Handbag Set', store: 'LuxeAccess.', price: '₦42,000', num: 42000, cat: 'Fashion', mall: 'WJ', badge: '', rating: 4.6 },
+
+      //=== (FG) FOOD & GROCERIES
+      { id: 'G1', emoji: '🛒', name: 'Premium Grocery Bundle', store: 'FreshMart', price: '₦25,000', num: 25000, cat: 'Groceries', mall: 'FG', badge: '', rating: 4.5 },
+      { id: 'G2', emoji: '🥩', name: 'Frozen Assorted Meats 5kg', store: 'ColdChain', price: '₦18,000', num: 18000, cat: 'Groceries', mall: 'FG', badge: 'new', rating: 4.3 },
+      { id: 'G3', emoji: '🍎', name: 'Fresh Organic Fruits Basket', store: 'FreshFarm', price: '₦12,000', num: 12000, cat: 'Groceries', mall: 'FG', badge: '', rating: 4.7 },
+
+      //=== (FD) FURNITURE & DECOR
+      { id: 'H1', emoji: '🛋️', name: 'L-Shaped Sofa Set', store: 'HomePlus', price: '₦450,000', num: 450000, cat: 'Home & Decor', mall: 'FD', badge: '', rating: 4.7 },
+      { id: 'H3', emoji: '💡', name: 'LED Chandelier Set', store: 'LightWorld', price: '₦75,000', num: 75000, cat: 'Home & Decor', mall: 'FD', badge: 'sale', rating: 4.5 },
+
+
+
+      //=== (PN) PLANT & NATURE
+      { id: 'H2', emoji: '🪴', name: 'Indoor Plant Bundle (5)', store: 'GreenNest', price: '₦15,000', num: 15000, cat: 'Pant & Nature', mall: 'PN', badge: 'new', rating: 4.9 },
+
+
+      //=== (CB) COSTMATICS & BEAUTY
+      { id: 'B1', emoji: '💄', name: 'MAC Cosmetics Bundle', store: 'BeautyHub', price: '₦55,000', num: 55000, cat: 'Beauty', mall: 'CB', badge: 'hot', rating: 4.8 },
+      { id: 'B2', emoji: '🧴', name: 'Skincare Routine Set', store: 'GlowUp', price: '₦32,000', num: 32000, cat: 'Beauty', mall: 'CB', badge: 'new', rating: 4.7 },
+      { id: 'B3', emoji: '💅', name: 'Nail Art Kit Pro', store: 'GlowUp', price: '₦14,000', num: 14000, cat: 'Beauty', mall: 'CB', badge: 'sale', rating: 4.5 },
+      { id: 'W2', emoji: '🧴', name: 'Hair Products Carton (24)', store: 'BeautyDistrib', price: '₦96,000', num: 96000, cat: 'Wholesale', mall: 'CB', badge: 'sale', rating: 4.4 },
+
+
+      //=== (GC) GOCOINS
+      { id: 'GC', emoji: '💰', name: 'goCOINs Shopping Coins', store: 'goCOINS Token', price: '₦1,000', num: 1000, cat: 'Coupon', mall: 'GC', badge: 'sale', rating: 4.4 },
+
+      //====(DJ) DRINKS & JUICE
+      { id: 'DJ', emoji: '🍾', name: 'Jack Daniels', store: 'Shoprite Mall', price: '₦175,000', num: 175000, cat: 'Alcoholic Drinks', mall: 'DJ', badge: 'sale', rating: 4.4 },
+
+      //====(VF) VEG & FRUITS
+      { id: 'VF', emoji: '🍾', name: 'Jack Daniels', store: 'Shoprite Mall', price: '₦175,000', num: 175000, cat: 'Alcoholic Drinks', mall: 'VF', badge: 'sale', rating: 4.4 },
+
+      //====(SS) SEASONING & SPICES
+      { id: 'SS', emoji: '🍾', name: 'Jack Daniels', store: 'Shoprite Mall', price: '₦175,000', num: 175000, cat: 'Alcoholic Drinks', mall: 'SS', badge: 'sale', rating: 4.4 },
+    ];
+
+    const faqs = {
+      delivery: { q: '🚚 Delivery', a: 'Delivery times:<br>• <strong>Within Resident location:</strong> 1–2 business days<br>• <strong>Other states:</strong> 2–5 business days<br>• <strong>Express:</strong> Same day (+₦3,500)<br><br>Free delivery on orders above <strong>₦150,000</strong>! 🎉' },
+      payment: { q: '💳 Payment', a: 'We accept:<br>• 🏦 Bank Transfer (0265544737)<br>• 📱 Pay on Delivery(coming soon)<br>• 📞 USSD Payment<br>• 💳 Debit/Credit Card<br>• 🪙 goCOINS Token (GCDT)<br><br>All payments are secured and must be confirmed before dispatch.' },
+      return: { q: '↩️ Returns', a: 'You can return items within <strong>7 days</strong> of delivery.<br><br>• Item must be unused in original packaging<br>• Receipt / Order ID required<br>• Refunds in <strong>3–5 business days</strong>' },
+      warranty: { q: '🛡️ Warranty', a: '• Electronics: <strong>6–12 months</strong><br>• Fashion: <strong>14-day exchange</strong><br>• Home items: <strong>30-day quality guarantee</strong><br><br>Warranty claims are handled directly by our response team and support AI Agent.' },
+      bulk: { q: '📦 Bulk Pricing', a: 'Volume discounts:<br>• 10–49 units → <strong>5% off</strong><br>• 50–99 units → <strong>10% off</strong><br>• 100+ units → <strong>Custom pricing</strong><br><br>Request a formal quote below.' },
+    };
+
+    // ════════════════════════════════
+    // STATE
+    // ════════════════════════════════
+    let mall = null;
+    let cart = [];
+    let compareList = [];
+
+    // ════════════════════════════════
+    // STORE STATE (localStorage-backed)
+    // ════════════════════════════════
+    const FREE_LIMIT = 10;
+    const VALID_PIN = 'VISHA2026'; // demo PIN (in production this would be server-validated)
+
+    let myStore = null; // registered store object
+    let storeProducts = []; // merchant's uploaded products
+    let storeHasPin = false; // unlock status
+    let storeRegStep = 1;
+    let storeRegData = {};
+    let pinBuffer_store = '';
+    let pinBuffer_csv = '';
+
+    try { myStore = JSON.parse(localStorage.getItem('visha_store') || 'null'); } catch (e) { }
+    try { storeProducts = JSON.parse(localStorage.getItem('visha_products') || '[]'); } catch (e) { }
+    try { storeHasPin = JSON.parse(localStorage.getItem('visha_pin_unlocked') || 'false'); } catch (e) { }
+
+    function saveStore() { try { localStorage.setItem('visha_store', JSON.stringify(myStore)); } catch (e) { } }
+    function saveStoreProducts() { try { localStorage.setItem('visha_products', JSON.stringify(storeProducts)); } catch (e) { } }
+    function savePinStatus() { try { localStorage.setItem('visha_pin_unlocked', JSON.stringify(storeHasPin)); } catch (e) { } }
+
+    // ════════════════════════════════
+    // WHATSAPP
+    // ════════════════════════════════
+    function wa(msg) { window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`, '_blank'); }
+
+    // ════════════════════════════════
+    // TIME
+    // ════════════════════════════════
+    function ts() { return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }); }
+    function genID(prefix) { return prefix + '-' + Date.now().toString(36).toUpperCase().slice(-6); }
+
+    // ════════════════════════════════
+    // CHAT
+    // ════════════════════════════════
+    function botMsg(html, extra = '') {
+      const a = document.getElementById('messages');
+      const d = document.createElement('div'); d.className = 'msg bot';
+      d.innerHTML = `<div class="msg-av">🛍️</div><div class="msg-col"><div class="bubble">${html}</div>${extra}<div class="msg-time">${ts()}</div></div>`;
+      a.appendChild(d); a.scrollTop = a.scrollHeight;
+    }
+    function userMsg(t) {
+      const a = document.getElementById('messages');
+      const d = document.createElement('div'); d.className = 'msg user';
+      d.innerHTML = `<div class="msg-av">👤</div><div class="msg-col"><div class="bubble">${t}</div><div class="msg-time">${ts()}</div></div>`;
+      a.appendChild(d); a.scrollTop = a.scrollHeight;
+    }
+    function typing(cb, delay = 700 + Math.random() * 300) {
+      const a = document.getElementById('messages');
+      const d = document.createElement('div'); d.className = 'msg bot'; d.id = 'typ';
+      d.innerHTML = `<div class="msg-av">🛍️</div><div class="msg-col"><div class="typing-bubble"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+      a.appendChild(d); a.scrollTop = a.scrollHeight;
+      setTimeout(() => { document.getElementById('typ')?.remove(); cb(); }, delay);
+    }
+
+    // ════════════════════════════════
+    // MALL SELECTION
+    // ════════════════════════════════
+    function mallGrid() {
+      const storeCount = storeProducts.length;
+      const storeCard = myStore ? `
+    <div class="mall-card" style="border-color:rgba(108,99,255,0.35);background:rgba(108,99,255,0.04);" onclick="viewMyStoreMall()">
+      <div class="mc-emoji">${myStore.emoji || '🏪'}</div>
+      <div class="mc-name">${myStore.name}</div>
+      <div class="mc-loc">📍 ${myStore.address}</div>
+      <div class="mc-tag" style="background:rgba(108,99,255,0.1);color:var(--store);border-color:rgba(108,99,255,0.2);">My Store · ${storeCount} Products</div>
+    </div>` : `
+    <div class="mall-card" style="border-color:rgba(108,99,255,0.25);border-style:dashed;" onclick="openOverlay('overlayAddStore');renderStoreReg()">
+      <div class="mc-emoji">➕</div>
+      <div class="mc-name" style="color:var(--store);">Start Selling</div>
+      <div class="mc-loc">Link your WhatsApp Business Catalog</div>
+      <div class="mc-tag" style="background:rgba(108,99,255,0.1);color:var(--store);border-color:rgba(108,99,255,0.2);">START FREE</div>
+    </div>`;
+
+      return `<div class="mall-grid">
+    ${malls.map(m => `<div class="mall-card" onclick="pickMall('${m.id}',this)">
+      <div class="mc-emoji">${m.emoji}</div>
+      <div class="mc-name">${m.name}</div>
+      <div class="mc-loc">📍 ${m.loc}</div>
+      <div class="mc-tag">${m.tag}</div>
+    </div>`).join('')}
+    ${storeCard}
+  </div>`;
+    }
+
+    function viewMyStoreMall() {
+      userMsg(`${myStore.emoji || '🏪'} ${myStore.name}`);
+      typing(() => {
+        const allProds = getAllDisplayProducts();
+        const mine = allProds.filter(p => p._merchant === true);
+        botMsg(`Welcome to <strong>${myStore.name}</strong>! 🏪<br>📍 ${myStore.address} · <strong>${storeProducts.length} products</strong>`,
+          mine.length
+            ? `<div class="product-list">${mine.slice(0, 6).map(pcard).join('')}</div>
+           <div class="chips" style="margin-top:8px;">
+             <div class="chip store-chip" onclick="openStoreDashboard()">⚙️ Manage Store</div>
+             <div class="chip" onclick="openCart()">🛒 Cart (${cart.length})</div>
+           </div>`
+            : `<div class="chips"><div class="chip store-chip" onclick="openStoreDashboard()">⚙️ Add Products</div></div>`
+        );
+      }, 900);
+    }
+
+    function pickMall(id, el) {
+      mall = malls.find(m => m.id === id);
+      document.querySelectorAll('.mall-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      userMsg(`${mall.emoji} ${mall.name}`);
+      document.getElementById('mallBannerText').textContent = `${mall.emoji} ${mall.name} — ${mall.loc}`;
+      document.getElementById('mallBanner').classList.add('show');
+      typing(() => {
+        botMsg(`Welcome to <strong>${mall.name}</strong>! 🎉<br>📍 ${mall.loc} · <strong>${mall.stores}+ stores</strong><br><br>What would you like to do today?`, mainMenu());
+      }, 900);
+    }
+    function changeMall() { mall = null; document.getElementById('mallBanner').classList.remove('show'); typing(() => { botMsg('No problem! Choose a product category or shop from your own store:', mallGrid()); }); }
+
+    // ════════════════════════════════
+    // MAIN MENU
+    // ════════════════════════════════
+    function mainMenu() {
+      return `<div class="chips">
+    <div class="chip" onclick="go('browse')">🛍️ Browse Products</div>
+    <div class="chip" onclick="go('search')">🔍 Search</div>
+    <div class="chip" onclick="go('deals')">🔥 Hot Deals</div>
+    <div class="chip" onclick="go('categories')">📂 Categories</div>
+    <div class="chip" onclick="go('compare')">⚖️ Compare Items</div>
+    <div class="chip" onclick="go('track')">🚚 Track Order</div>
+    <div class="chip" onclick="go('bulk')">📦 Bulk Order</div>
+    <div class="chip" onclick="go('return')">↩️ Return & Refund</div>
+    <div class="chip" onclick="go('support')">🎧 Support</div>
+    <div class="chip" onclick="go('alert')">🔔 Price Alert</div>
+    <div class="chip" onclick="go('promo')">🎁 Promo Codes</div>
+    <div class="chip" onclick="go('review')">⭐ Leave Review</div>
+    <div class="chip" onclick="openCart()">🛒 My Cart (${cart.length})</div>
+    <div class="chip store-chip" onclick="go('addstore')">🏪 ${myStore ? 'My Store' : 'Add Products'}</div>
+    <div class="chip" onclick="changeMall()">🏬 Change Category</div>
+  </div>`;
+    }
+
+    function go(action) {
+      const labels = { browse: '🛍️ Browse Products', search: '🔍 Search', deals: '🔥 Hot Deals', categories: '📂 Categories', compare: '⚖️ Compare Items', track: '🚚 Track Order', bulk: '📦 Bulk Order', return: '↩️ Return & Refund', support: '🎧 Support', alert: '🔔 Price Alert', promo: '🎁 Promo Codes', review: '⭐ Leave Review', addstore: '🏪 Start Selling' };
+      if (labels[action]) userMsg(labels[action]);
+      switch (action) {
+        case 'browse': doBrowse(); break;
+        case 'search': openSearch(); break;
+        case 'deals': doDeals(); break;
+        case 'categories': doCategories(); break;
+        case 'compare': doCompare(); break;
+        case 'track': doTrack(); break;
+        case 'bulk': doBulk(); break;
+        case 'return': doReturn(); break;
+        case 'support': doSupport(); break;
+        case 'alert': doAlert(); break;
+        case 'promo': doPromo(); break;
+        case 'review': doReview(); break;
+        case 'addstore': doAddStore(); break;
+      }
+    }
+
+    // ════════════════════════════════
+    // ADD MY STORE — CHAT ENTRY
+    // ════════════════════════════════
+    function doAddStore() {
+      if (myStore) {
+        typing(() => {
+          botMsg(`Welcome back, <strong>${myStore.ownerName}</strong>! 🏪 Here's your store dashboard:`, storeDashCard());
+        });
+      } else {
+        typing(() => {
+          botMsg(`🏪 <strong>Join Vendors</strong><br><br>Link your WhatsApp Business catalog products to ViShA <strong>digital online store</strong> — reach more customers, manage products, sell multiple products and accept orders via ViShA Vendor Assistant!`,
+            `<div class="store-hero">
+          <div class="sh-title">Your Store, Online Today</div>
+          <div class="sh-sub">Link your WhatsApp Business catalog products & get a free digital storefront instantly.</div>
+          <div class="sh-steps">
+            <div class="sh-step"><div class="sh-step-num">Step 1</div><div class="sh-step-txt">📋 Business Details</div></div>
+            <div class="sh-step"><div class="sh-step-num">Step 2</div><div class="sh-step-txt">📍 Location & Socials</div></div>
+            <div class="sh-step"><div class="sh-step-num">Step 3</div><div class="sh-step-txt">📸 Store Branding</div></div>
+            <div class="sh-step"><div class="sh-step-num">Step 4</div><div class="sh-step-txt">✅ Go Live!</div></div>
+          </div>
+        </div>
+        <div class="chips"><div class="chip store-chip" onclick="openOverlay('overlayAddStore');renderStoreReg()">🏪 Get Merchant ID Now</div><div class="chip" onclick="go('browse')">← Browse First</div></div>`
+          );
+        });
+      }
+    }
+
+    function storeDashCard() {
+      const count = storeProducts.length;
+      const pct = Math.min((count / FREE_LIMIT) * 100, 100);
+      const warn = count >= FREE_LIMIT;
+      return `<div class="store-dash">
+    <div class="sd-header">
+      <div class="sd-logo">${myStore.emoji || '🏪'}</div>
+      <div>
+        <div class="sd-name">${myStore.name}</div>
+        <div class="sd-id">${myStore.storeId}</div>
+        <div class="sd-verified">✓ VERIFIED STORE</div>
+      </div>
+    </div>
+    <div class="sd-stats">
+      <div class="sd-stat"><div class="sd-stat-val">${count}</div><div class="sd-stat-lbl">Products</div></div>
+      <div class="sd-stat"><div class="sd-stat-val">${FREE_LIMIT}</div><div class="sd-stat-lbl">Free Limit</div></div>
+      <div class="sd-stat"><div class="sd-stat-val">${storeHasPin ? '∞' : '+' + (FREE_LIMIT - count)}</div><div class="sd-stat-lbl">${storeHasPin ? 'Unlocked' : 'Slots Left'}</div></div>
+    </div>
+    <div class="quota-bar-wrap">
+      <div class="qb-label"><span>Product Quota</span><span>${count}/${storeHasPin ? '∞' : FREE_LIMIT}</span></div>
+      <div class="qb-track"><div class="qb-fill ${warn && !storeHasPin ? 'warn' : ''}" style="width:${storeHasPin ? 30 : pct}%"></div></div>
+      <div class="qb-sub">${storeHasPin ? '🔓 Unlimited (PIN activated)' : warn ? '⚠️ Free limit reached — buy Upload PIN to add more' : '✅ ' + (FREE_LIMIT - count) + ' free product slots remaining'}</div>
+    </div>
+    <div class="sd-actions" style="margin-top:12px;">
+      <div class="sd-action primary" onclick="openStoreDashboard()">⚙️ Manage Store</div>
+      <div class="sd-action" onclick="openOverlay('overlayAddProduct');checkQuotaWarning()">➕ Add Product</div>
+      <div class="sd-action" onclick="openCSVUpload()">📂 CSV Upload</div>
+      <div class="sd-action" onclick="shareStore()">🔗 Share Store</div>
+    </div>
+  </div>
+  <div class="chips"><div class="chip" onclick="go('browse')">🛍️ Browse All</div></div>`;
+    }
+
+    // ════════════════════════════════
+    // STORE REGISTRATION (multi-step)
+    // ════════════════════════════════
+    function resetStoreReg() { storeRegStep = 1; storeRegData = {}; pinBuffer_store = ''; }
+
+    function renderStoreReg() {
+      resetStoreReg();
+      renderStoreStep(1);
+    }
+
+    function renderStoreStep(step) {
+      storeRegStep = step;
+      const body = document.getElementById('addStoreBody');
+      const footer = document.getElementById('addStoreFooter');
+
+      const stepsHtml = `<div class="reg-steps">
+    <div class="rs-node ${step >= 1 ? step > 1 ? 'done' : 'active' : ''}">1</div><div class="rs-line"></div>
+    <div class="rs-node ${step >= 2 ? step > 2 ? 'done' : 'active' : ''}">2</div><div class="rs-line"></div>
+    <div class="rs-node ${step >= 3 ? step > 3 ? 'done' : 'active' : ''}">3</div><div class="rs-line"></div>
+    <div class="rs-node ${step >= 4 ? 'active' : ''}">4</div>
+  </div>`;
+
+      if (step === 1) {
+        body.innerHTML = `${stepsHtml}
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;">Tell us about your business — this creates your <strong>digital store identity</strong>.</p>
+      <div class="form-group"><label class="form-label">Store / Business Name *</label><input class="form-input" id="sr_name" placeholder="e.g. Mama Ngozi Spices" value="${storeRegData.name || ''}"></div>
+      <div class="form-group"><label class="form-label">Which best describes your business? *</label>
+        <select class="form-select" id="sr_cat">
+          <option value="">--Select a category here--</option>
+          <option ${storeRegData.cat === 'Fashion' ? 'selected' : ''}>👗Clothings & Fabrics</option>
+          <option ${storeRegData.cat === 'Electronics & Appliances' ? 'selected' : ''}>📺Electronics & Appliances</option>
+          <option ${storeRegData.cat === 'Food & Groceries' ? 'selected' : ''}>🥗Food & Groceries</option>
+          <option ${storeRegData.cat === 'Cosmetics & Beauty' ? 'selected' : ''}>💄Cosmetics & Beauty</option>
+          <option ${storeRegData.cat === 'Drinks & Juice' ? 'selected' : ''}>🍾Drinks & Juice</option>
+          <option ${storeRegData.cat === 'Watches & Jewelries' ? 'selected' : ''}>⌚Watches & Jewelries</option>
+          <option ${storeRegData.cat === 'Shoes & Footwares' ? 'selected' : ''}>🥾Shoes & Footwares</option>
+          <option ${storeRegData.cat === 'Phones & Tablets' ? 'selected' : ''}>📱Phones & Tablets</option>
+          <option ${storeRegData.cat === 'Computer & Laptops' ? 'selected' : ''}>🖥️Computer & Laptops</option>
+          <option ${storeRegData.cat === 'Gadgets & Gears' ? 'selected' : ''}>🎮Gadgets & Gears</option>
+          <option ${storeRegData.cat === 'Medicine & Healthcare' ? 'selected' : ''}>💊Medicine & Healthcare</option>
+          <option ${storeRegData.cat === 'Seasoning & Spices' ? 'selected' : ''}>🌶️Seasoning & Spices</option>
+          <option ${storeRegData.cat === 'Art & Crafts' ? 'selected' : ''}>🖼️Art & Crafts</option>
+          <option ${storeRegData.cat === 'Vegitable & Fruits' ? 'selected' : ''}>🍉Vegitable & Fruits</option>
+          <option ${storeRegData.cat === 'Plants & Nature' ? 'selected' : ''}>🌳Plants & Nature</option>
+          <option ${storeRegData.cat === 'Furnitures & Decors' ? 'selected' : ''}>🛋️Furnitures & Decors</option>
+          <option ${storeRegData.cat === 'Bills & Utility' ? 'selected' : ''}>⚡️Bills & Utility</option>
+          <option ${storeRegData.cat === 'Token Exchanger' ? 'selected' : ''}>💱Exchanger</option>
+          <option ${storeRegData.cat === 'Other' ? 'selected' : ''}>Other</option>
+        </select>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Owner Full Name *</label><input class="form-input" id="sr_owner" placeholder="Your name" value="${storeRegData.ownerName || ''}"></div>
+        <div class="form-group"><label class="form-label">WhatsApp Number *</label><input class="form-input" id="sr_phone" type="tel" placeholder="+234 800 000 0000" value="${storeRegData.phone || ''}"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Store Description</label><textarea class="form-textarea" id="sr_desc" placeholder="What do you sell? What makes your store unique?" style="min-height:70px;">${storeRegData.desc || ''}</textarea></div>`;
+        footer.innerHTML = `<button class="store-btn" onclick="saveStoreStep1()">Next → Location Details</button>`;
+      }
+
+      else if (step === 2) {
+        body.innerHTML = `${stepsHtml}
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;">Help customers find your <strong>physical location</strong> and connect online.</p>
+      <div class="form-group"><label class="form-label">Physical Address / Location *</label><input class="form-input" id="sr_addr" placeholder="Street, area, city" value="${storeRegData.address || ''}"></div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">City *</label><input class="form-input" id="sr_city" placeholder="Abuja" value="${storeRegData.city || ''}"></div>
+        <div class="form-group"><label class="form-label">State *</label>
+          <select class="form-select" id="sr_state">
+            ${['Abuja (FCT)', 'Lagos', 'Rivers', 'Kano', 'Ogun', 'Delta', 'Enugu', 'Kogi', 'Anambra', 'Imo', 'Cross River', 'Other'].map(s => `<option ${storeRegData.state === s ? 'selected' : ''}>${s}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Opening Hours</label><input class="form-input" id="sr_hours" placeholder="e.g. Mon–Sat 8am–8pm" value="${storeRegData.hours || ''}"></div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Instagram (optional)</label><input class="form-input" id="sr_ig" placeholder="@yourstorename" value="${storeRegData.instagram || ''}"></div>
+        <div class="form-group"><label class="form-label">Website (optional)</label><input class="form-input" id="sr_web" placeholder="www.yourstore.com" value="${storeRegData.website || ''}"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Accept Delivery?</label>
+        <select class="form-select" id="sr_delivery">
+          <option ${storeRegData.delivery === 'Yes – Citywide' ? 'selected' : ''}>Yes – Citywide</option>
+          <option ${storeRegData.delivery === 'Yes – Nationwide' ? 'selected' : ''}>Yes – Nationwide</option>
+          <option ${storeRegData.delivery === 'Pickup Only' ? 'selected' : ''}>Pickup Only</option>
+          <option ${storeRegData.delivery === 'Delivery on Request' ? 'selected' : ''}>Delivery on Request</option>
+        </select>
+      </div>`;
+        footer.innerHTML = `
+      <button class="store-btn" onclick="saveStoreStep2()">Next → Branding</button>
+      <button class="wa-btn wa-btn-ghost" style="margin-top:8px;" onclick="renderStoreStep(1)">← Back</button>`;
+      }
+
+      else if (step === 3) {
+        const emojis = ['🏪', '🛍️', '🍎', '👗', '💄', '📱', '🏠', '🌿', '🍲', '💍', '🧴', '👟', '🎁', '🔧', '📚', '🍕', '🌺', '🧵', '💻', '🛒', '🚗'];
+        body.innerHTML = `${stepsHtml}
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;">Choose a <strong>store icon</strong> and payment methods.</p>
+      <div class="form-group">
+        <label class="form-label">Store Icon (Pick one)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;" id="emojiPicker">
+          ${emojis.map(e => `<div onclick="pickEmoji(this,'${e}')" style="width:40px;height:40px;border-radius:9px;background:var(--surface2);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:.18s;${storeRegData.emoji === e ? 'border-color:var(--store);background:var(--store-light);' : ''}">${e}</div>`).join('')}
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Accepted Payment Methods</label>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:5px;">
+          ${['Bank Transfer', 'Card', 'POS', 'goCOINs'].map(m => `
+            <label style="display:flex;align-items:center;gap:5px;font-size:12.5px;cursor:pointer;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;padding:6px 11px;">
+              <input type="checkbox" value="${m}" ${(storeRegData.payment || []).includes(m) ? 'checked' : ''} onchange="togglePayment(this)"> ${m}
+            </label>`).join('')}
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Minimum Order Amount (optional)</label><input class="form-input" id="sr_minorder" type="number" placeholder="e.g. 5000" value="${storeRegData.minOrder || ''}"></div>`;
+        footer.innerHTML = `
+      <button class="store-btn" onclick="saveStoreStep3()">Next → Preview & Launch</button>
+      <button class="wa-btn wa-btn-ghost" style="margin-top:8px;" onclick="renderStoreStep(2)">← Back</button>`;
+      }
+
+      else if (step === 4) {
+        const emoji = storeRegData.emoji || '🏪';
+        body.innerHTML = `${stepsHtml}
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:50px;margin-bottom:8px;">${emoji}</div>
+        <div style="font-size:17px;font-weight:800;">${storeRegData.name}</div>
+        <div style="font-size:12px;color:var(--text-muted);">${storeRegData.cat} · ${storeRegData.city}, ${storeRegData.state}</div>
+        <div style="margin-top:6px;font-size:11.5px;color:var(--teal-deep);font-weight:700;">✓ Ready to go live!</div>
+      </div>
+      <div class="info-card">
+        <div class="ic-row"><div class="ic-icon">👤</div><div class="ic-text"><div class="ic-label">Owner</div>${storeRegData.ownerName} · ${storeRegData.phone}</div></div>
+        <div class="ic-row"><div class="ic-icon">📍</div><div class="ic-text"><div class="ic-label">Location</div>${storeRegData.address}, ${storeRegData.city}</div></div>
+        <div class="ic-row"><div class="ic-icon">⏰</div><div class="ic-text"><div class="ic-label">Hours</div>${storeRegData.hours || 'Not specified'}</div></div>
+        <div class="ic-row"><div class="ic-icon">🚚</div><div class="ic-text"><div class="ic-label">Delivery</div>${storeRegData.delivery || 'Not specified'}</div></div>
+        <div class="ic-row"><div class="ic-icon">💳</div><div class="ic-text"><div class="ic-label">Payments</div>${(storeRegData.payment || ['Bank Transfer']).join(', ')}</div></div>
+      </div>
+      <div class="info-card" style="margin-top:8px;background:rgba(0,201,167,0.04);border-color:rgba(0,201,167,0.2);">
+        <div class="ic-row"><div class="ic-icon">🆓</div><div class="ic-text"><div class="ic-label">Free tier</div>Upload up to <strong>10 products</strong> for free. Buy an Upload PIN (₦5,000) for unlimited product upload via CSV.</div></div>
+        <div class="ic-row"><div class="ic-icon">🔗</div><div class="ic-text"><div class="ic-label">Digital Store</div>Your store will appear in goSHOPs's Online Mall listing immediately.</div></div>
+      </div>`;
+        footer.innerHTML = `
+      <button class="store-btn" onclick="finalizeStoreReg()">🚀 Connect My Store</button>
+      <button class="wa-btn wa-btn-ghost" style="margin-top:8px;" onclick="renderStoreStep(3)">← Back</button>`;
+      }
+    }
+
+    function pickEmoji(el, emoji) {
+      storeRegData.emoji = emoji;
+      document.querySelectorAll('#emojiPicker > div').forEach(d => { d.style.borderColor = 'var(--border)'; d.style.background = 'var(--surface2)'; });
+      el.style.borderColor = 'var(--store)'; el.style.background = 'var(--store-light)';
+    }
+    function togglePayment(cb) {
+      if (!storeRegData.payment) storeRegData.payment = [];
+      if (cb.checked) { storeRegData.payment.push(cb.value); }
+      else { storeRegData.payment = storeRegData.payment.filter(p => p !== cb.value); }
+    }
+
+    function saveStoreStep1() {
+      const name = document.getElementById('sr_name').value.trim();
+      const cat = document.getElementById('sr_cat').value;
+      const owner = document.getElementById('sr_owner').value.trim();
+      const phone = document.getElementById('sr_phone').value.trim();
+      const desc = document.getElementById('sr_desc').value.trim();
+      if (!name || !cat || !owner || !phone) { alert('Please fill in all required fields.'); return; }
+      Object.assign(storeRegData, { name, cat, ownerName: owner, phone, desc });
+      renderStoreStep(2);
+    }
+    function saveStoreStep2() {
+      const addr = document.getElementById('sr_addr').value.trim();
+      const city = document.getElementById('sr_city').value.trim();
+      const state = document.getElementById('sr_state').value;
+      const hours = document.getElementById('sr_hours').value.trim();
+      const ig = document.getElementById('sr_ig').value.trim();
+      const web = document.getElementById('sr_web').value.trim();
+      const del = document.getElementById('sr_delivery').value;
+      if (!addr || !city) { alert('Please enter your business address and city.'); return; }
+      Object.assign(storeRegData, { address: addr, city, state, hours, instagram: ig, website: web, delivery: del });
+      renderStoreStep(3);
+    }
+    function saveStoreStep3() {
+      if (!storeRegData.payment || storeRegData.payment.length === 0) storeRegData.payment = ['Bank Transfer'];
+      if (!storeRegData.emoji) storeRegData.emoji = '🏪';
+      storeRegData.minOrder = document.getElementById('sr_minorder').value;
+      renderStoreStep(4);
+    }
+
+    function finalizeStoreReg() {
+      const storeId = genID('SB');
+      myStore = {
+        ...storeRegData,
+        storeId,
+        createdAt: new Date().toISOString(),
+        joinedDate: new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' }),
+      };
+      saveStore();
+      closeOverlay('overlayAddStore');
+
+      // notify WA
+      const msg = `🏪 *NEW STORE REGISTRATION — goSHOPs*\n\n🆔 *Store ID:* ${storeId}\n🏪 *Store:* ${myStore.name}\n📦 *Category:* ${myStore.cat}\n👤 *Owner:* ${myStore.ownerName}\n📞 *Phone:* ${myStore.phone}\n📍 *Address:* ${myStore.address}, ${myStore.city}\n🚚 *Delivery:* ${myStore.delivery}\n\n⏰ Registered: ${ts()} via ViShA Merchant Assistant`;
+      wa(msg);
+
+      typing(() => {
+        botMsg(`🎉 <strong>Congratulations, ${myStore.ownerName}!</strong><br><br>Your store <strong>${myStore.name}</strong> is now <strong>live on goSHOPs</strong>! 🏪✨<br><br>Start adding products — first <strong>10 are FREE</strong>. You'll be redirected to WhatsApp to confirm your registration.`,
+          `<div class="chips">
+        <div class="chip store-chip" onclick="openStoreDashboard()">⚙️ Manage My Store</div>
+        <div class="chip" onclick="openOverlay('overlayAddProduct');checkQuotaWarning()">➕ Add First Product</div>
+        <div class="chip" onclick="go('browse')">🛍️ Browse Product Categories</div>
+      </div>`
+        );
+      }, 800);
+    }
+
+    // ════════════════════════════════
+    // STORE DASHBOARD
+    // ════════════════════════════════
+    function openStoreDashboard() {
+      if (!myStore) { openOverlay('overlayAddStore'); renderStoreReg(); return; }
+      document.getElementById('dashTitle').textContent = `🏪 ${myStore.name}`;
+      renderDashboard();
+      openOverlay('overlayStoreDash');
+    }
+
+    function renderDashboard() {
+      const body = document.getElementById('storeDashBody');
+      const footer = document.getElementById('storeDashFooter');
+      const count = storeProducts.length;
+      const pct = Math.min((count / FREE_LIMIT) * 100, 100);
+      const warn = count >= FREE_LIMIT && !storeHasPin;
+
+      body.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <div class="sd-logo">${myStore.emoji || '🏪'}</div>
+      <div>
+        <div style="font-size:15px;font-weight:800;">${myStore.name}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);">${myStore.storeId}</div>
+        <div class="sd-verified">✓ VERIFIED</div>
+      </div>
+      <div style="margin-left:auto;font-size:11px;color:var(--text-muted);text-align:right;">📍 ${myStore.city}<br>📅 ${myStore.joinedDate}</div>
+    </div>
+
+    <div class="quota-bar-wrap" style="margin-bottom:12px;">
+      <div class="qb-label"><span>📦 Product Quota</span><span>${count} / ${storeHasPin ? '∞' : FREE_LIMIT}</span></div>
+      <div class="qb-track"><div class="qb-fill ${warn ? 'warn' : ''}" style="width:${storeHasPin ? Math.min(30, pct) : pct}%"></div></div>
+      <div class="qb-sub">${storeHasPin ? '🔓 Unlimited uploads active' : warn ? '⚠️ Free limit reached — purchase Upload PIN to continue' : '✅ ' + (FREE_LIMIT - count) + ' free slots remaining'}</div>
+    </div>
+
+    <div style="font-size:12px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">My Products (${count})</div>
+
+    ${count === 0
+          ? `<div style="text-align:center;padding:24px 0;color:var(--text-muted);">
+           <div style="font-size:36px;margin-bottom:8px;">📦</div>
+           <div style="font-size:13px;">No products yet.<br>Add your first product below!</div>
+         </div>`
+          : storeProducts.map((p, i) => `
+          <div class="store-product-row">
+            <div class="spr-emoji">${p.emoji || '📦'}</div>
+            <div class="spr-info">
+              <div class="spr-name">${p.name}</div>
+              <div class="spr-price">₦${parseInt(p.num || 0).toLocaleString()} · ${p.cat}</div>
+            </div>
+            <button class="spr-del" onclick="deleteStoreProduct(${i})">🗑 Del</button>
+          </div>`).join('')
+        }`;
+
+      footer.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <button class="store-btn" style="margin-top:0;" onclick="closeOverlay('overlayStoreDash');openOverlay('overlayAddProduct');checkQuotaWarning()">➕ Add Product</button>
+      <button class="store-btn" style="margin-top:0;background:linear-gradient(135deg,#059669,#10B981);" onclick="closeOverlay('overlayStoreDash');openCSVUpload()">📂 CSV Upload</button>
+    </div>
+    <button class="wa-btn wa-btn-ghost" style="margin-top:8px;" onclick="shareStore()">🔗 Share My Store</button>`;
+    }
+
+    function deleteStoreProduct(idx) {
+      if (!confirm('Remove this product from your store?')) return;
+      storeProducts.splice(idx, 1);
+      saveStoreProducts();
+      renderDashboard();
+    }
+
+    function shareStore() {
+      if (!myStore) return;
+      wa(`🏪 *${myStore.name}*\n\n📍 ${myStore.address}, ${myStore.city}\n📦 Category: ${myStore.cat}\n🆔 Store ID: ${myStore.storeId}\n\nShop with us goSHOPs! Send this message to browse our catalogue. 💚`);
+    }
+
+    // ════════════════════════════════
+    // ADD SINGLE PRODUCT
+    // ════════════════════════════════
+    function checkQuotaWarning() {
+      const el = document.getElementById('apQuotaWarn');
+      if (!el) return;
+      if (!myStore) { el.innerHTML = `<div class="alert-pill"><div class="ap-icon">⚠️</div><div class="ap-text">Please register your store first.</div></div>`; el.style.display = 'block'; return; }
+      if (storeProducts.length >= FREE_LIMIT && !storeHasPin) {
+        el.innerHTML = `<div class="alert-pill"><div class="ap-icon">🔒</div><div class="ap-text">You've reached the 10 free product limit.<br>Purchase an <strong>Upload PIN</strong> to add more.</div></div>`;
+        el.style.display = 'block';
+        document.querySelector('#overlayAddProduct .store-btn').onclick = () => { closeOverlay('overlayAddProduct'); openOverlay('overlayBuyPin'); };
+      } else {
+        el.style.display = 'none';
+        document.querySelector('#overlayAddProduct .store-btn').onclick = submitAddProduct;
+      }
+    }
+
+    function submitAddProduct() {
+      if (!myStore) { alert('Please register your store first.'); return; }
+      if (storeProducts.length >= FREE_LIMIT && !storeHasPin) { openOverlay('overlayBuyPin'); closeOverlay('overlayAddProduct'); return; }
+
+      const name = document.getElementById('ap_name').value.trim();
+      const price = document.getElementById('ap_price').value;
+      const cat = document.getElementById('ap_cat').value;
+      const emoji = document.getElementById('ap_emoji').value || '📦';
+      const badge = document.getElementById('ap_badge').value;
+      const desc = document.getElementById('ap_desc').value.trim();
+      const stock = document.getElementById('ap_stock').value;
+
+      if (!name || !price || !cat) { alert('Product name, price and category are required.'); return; }
+
+      const prod = {
+        id: genID('MP'), name, price: `₦${parseInt(price).toLocaleString()}`, num: parseInt(price),
+        cat, emoji, badge, desc, stock: parseInt(stock) || 0,
+        store: myStore.name, mall: myStore.storeId, rating: 5.0, _merchant: true,
+      };
+
+      storeProducts.push(prod);
+      saveStoreProducts();
+
+      // clear form
+      ['ap_name', 'ap_price', 'ap_emoji', 'ap_desc', 'ap_stock'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+      document.getElementById('ap_cat').value = '';
+      document.getElementById('ap_badge').value = '';
+
+      closeOverlay('overlayAddProduct');
+      typing(() => {
+        botMsg(`✅ <strong>${name}</strong> added to <strong>${myStore.name}</strong>! (${storeProducts.length}/${FREE_LIMIT} free slots used)`,
+          `<div class="chips">
+        <div class="chip store-chip" onclick="openStoreDashboard()">⚙️ View My Store</div>
+        <div class="chip" onclick="openOverlay('overlayAddProduct');checkQuotaWarning()">➕ Add Another</div>
+        ${storeProducts.length >= FREE_LIMIT && !storeHasPin ? `<div class="chip store-chip" onclick="openOverlay('overlayBuyPin')">🔑 Buy Upload PIN</div>` : ''}
+      </div>`
+        );
+      }, 600);
+    }
+
+    // ════════════════════════════════
+    // CSV UPLOAD
+    // ════════════════════════════════
+    function openCSVUpload() {
+      if (!myStore) { doAddStore(); return; }
+      renderCSVUploadBody();
+      openOverlay('overlayCSVUpload');
+    }
+
+    function renderCSVUploadBody() {
+      const body = document.getElementById('csvUploadBody');
+      const footer = document.getElementById('csvUploadFooter');
+      const locked = !storeHasPin && storeProducts.length >= FREE_LIMIT;
+
+      if (!storeHasPin) {
+        // show PIN entry first
+        body.innerHTML = `
+      <div class="alert-pill" style="${locked ? '' : 'display:none;'}" id="csvLockAlert">
+        <div class="ap-icon">🔒</div>
+        <div class="ap-text">Your free 10-product quota is full. Enter your Upload PIN or purchase one to continue.</div>
+      </div>
+      <div class="csv-info">
+        <div class="csv-info-title">📋 CSV File Format</div>
+        <div style="font-size:11.5px;color:var(--text-muted);line-height:1.7;">Your CSV must include these columns:</div>
+        <div style="margin-top:6px;">
+          <span class="csv-col">name</span><span class="csv-col">price</span><span class="csv-col">category</span>
+          <span class="csv-col">emoji</span><span class="csv-col">badge</span><span class="csv-col">description</span><span class="csv-col">stock</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:8px;">Max 500 rows per upload. UTF-8 encoding required.</div>
+      </div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px;">🔑 Enter Upload PIN to unlock CSV import:</div>
+      <div class="pin-section">
+        <div class="pin-title">Enter Your 4–10 Character PIN</div>
+        <div class="pin-dots" id="pinDotsCsv">
+          ${[1, 2, 3, 4, 5, 6, 7, 8].map(i => `<div class="pin-dot" id="csvpd${i}"></div>`).join('')}
+        </div>
+        <div class="pin-grid">
+          ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button class="pin-key" onclick="csvPinPress('${n}')">${n}</button>`).join('')}
+          <button class="pin-key del" onclick="csvPinDel()">⌫</button>
+          <button class="pin-key" onclick="csvPinPress('0')">0</button>
+          <button class="pin-key ok" onclick="csvPinSubmit()">✓</button>
+        </div>
+        <div class="pin-err-msg" id="csvPinErr">Incorrect PIN. Please try again.</div>
+      </div>`;
+        footer.innerHTML = `<button class="wa-btn" onclick="closeOverlay('overlayCSVUpload');openOverlay('overlayBuyPin')">🔑 Purchase Upload PIN</button>`;
+      } else {
+        renderCSVUnlocked(body, footer);
+      }
+    }
+
+    // PIN keypad for CSV
+    function csvPinPress(d) {
+      if (pinBuffer_csv.length >= 10) return;
+      pinBuffer_csv += d;
+      updateCsvPinDots();
+    }
+    function csvPinDel() {
+      pinBuffer_csv = pinBuffer_csv.slice(0, -1);
+      updateCsvPinDots();
+      document.getElementById('csvPinErr').style.display = 'none';
+    }
+    function updateCsvPinDots() {
+      for (let i = 1; i <= 8; i++) {
+        const d = document.getElementById('csvpd' + i);
+        if (d) { d.classList.toggle('filled', i <= pinBuffer_csv.length); d.classList.remove('err'); }
+      }
+    }
+    function csvPinSubmit() {
+      if (pinBuffer_csv.toUpperCase() === VALID_PIN) {
+        storeHasPin = true; savePinStatus();
+        document.getElementById('csvPinErr').style.display = 'none';
+        renderCSVUnlocked(document.getElementById('csvUploadBody'), document.getElementById('csvUploadFooter'));
+      } else {
+        document.getElementById('csvPinErr').style.display = 'block';
+        for (let i = 1; i <= 8; i++) { const d = document.getElementById('csvpd' + i); if (d) { d.classList.remove('filled'); d.classList.add('err'); } }
+        pinBuffer_csv = '';
+        setTimeout(() => { for (let i = 1; i <= 8; i++) { const d = document.getElementById('csvpd' + i); if (d) d.classList.remove('err'); } document.getElementById('csvPinErr').style.display = 'none'; }, 2000);
+      }
+    }
+
+    function renderCSVUnlocked(body, footer) {
+      body.innerHTML = `
+    <div style="text-align:center;padding:8px 0 14px;">
+      <div style="font-size:30px;margin-bottom:6px;">🔓</div>
+      <div style="font-size:14px;font-weight:800;color:var(--teal-deep);">CSV Upload Unlocked!</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:3px;">Import unlimited products for <strong>${myStore?.name || 'your store'}</strong></div>
+    </div>
+    <div class="csv-info">
+      <div class="csv-info-title">📋 Required CSV Format</div>
+      <div style="font-size:11.5px;color:var(--text-muted);line-height:1.7;">Your CSV must include these columns (row 1 = headers):</div>
+      <div style="margin-top:6px;">
+        <span class="csv-col">name</span><span class="csv-col">price</span><span class="csv-col">category</span>
+        <span class="csv-col">emoji</span><span class="csv-col">badge</span><span class="csv-col">description</span><span class="csv-col">stock</span>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);line-height:1.8;overflow-x:auto;white-space:nowrap;">
+        name,price,category,emoji,badge,stock<br>
+        Adire Dress,18500,Fashion,👗,new,25<br>
+        Leather Bag,42000,Fashion,👜,,10<br>
+        Skincare Set,32000,Beauty,🧴,sale,50
+      </div>
+    </div>
+    <div class="upload-zone" onclick="document.getElementById('csvFileInput').click()" id="csvZone">
+      <input type="file" id="csvFileInput" accept=".csv,.txt" onchange="processCSV(this)">
+      <div class="uz-icon">📂</div>
+      <div class="uz-text">Click to select your CSV file</div>
+      <div class="uz-sub">Max 500 products · .csv format</div>
+    </div>
+    <div id="csvPreview" style="margin-top:12px;"></div>`;
+      footer.innerHTML = `<button class="store-btn" id="csvConfirmBtn" style="display:none;" onclick="confirmCSVImport()">✅ Import Products to My Store</button>`;
+
+      // drag events
+      const zone = document.getElementById('csvZone');
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+      zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag'); const f = e.dataTransfer.files[0]; if (f) { const inp = document.getElementById('csvFileInput'); const dt = new DataTransfer(); dt.items.add(f); inp.files = dt.files; processCSV(inp); } });
+    }
+
+    let parsedCSVProducts = [];
+
+    function processCSV(input) {
+      const file = input.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const lines = e.target.result.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length < 2) { showCSVPreview(null, 'File seems empty or has only headers.'); return; }
+        const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
+        parsedCSVProducts = [];
+        const errors = [];
+        lines.slice(1).forEach((line, i) => {
+          const vals = line.split(',').map(v => v.trim().replace(/"/g, ''));
+          const row = {};
+          headers.forEach((h, j) => { row[h] = vals[j] || ''; });
+          if (!row.name || !row.price) { errors.push(`Row ${i + 2}: missing name or price`); return; }
+          const num = parseInt(row.price.replace(/[^0-9]/g, ''));
+          if (isNaN(num) || num <= 0) { errors.push(`Row ${i + 2}: invalid price "${row.price}"`); return; }
+          parsedCSVProducts.push({
+            id: genID('CSV'), name: row.name, price: `₦${num.toLocaleString()}`, num,
+            cat: row.category || 'Other', emoji: row.emoji || '📦', badge: row.badge || '',
+            desc: row.description || '', stock: parseInt(row.stock) || 0,
+            store: myStore?.name || 'My Store', mall: myStore?.storeId || 'MS', rating: 5.0, _merchant: true,
+          });
+        });
+        showCSVPreview(parsedCSVProducts, errors.length ? `⚠️ ${errors.length} row(s) skipped: ${errors.slice(0, 2).join('; ')}` : '');
+      };
+      reader.readAsText(file);
+    }
+
+    function showCSVPreview(prods, warn) {
+      const el = document.getElementById('csvPreview');
+      const btn = document.getElementById('csvConfirmBtn');
+      if (!prods || prods.length === 0) {
+        el.innerHTML = `<div style="color:var(--coral);font-size:12.5px;padding:10px;">${warn || 'No valid products found in file.'}</div>`;
+        if (btn) btn.style.display = 'none';
+        return;
+      }
+      el.innerHTML = `
+    ${warn ? `<div style="color:var(--amber);font-size:11.5px;margin-bottom:8px;">${warn}</div>` : ''}
+    <div style="font-size:12.5px;font-weight:700;margin-bottom:8px;">Preview — ${prods.length} products ready to import:</div>
+    ${prods.slice(0, 5).map(p => `
+      <div class="store-product-row">
+        <div class="spr-emoji">${p.emoji}</div>
+        <div class="spr-info"><div class="spr-name">${p.name}</div><div class="spr-price">${p.price} · ${p.cat}</div></div>
+      </div>`).join('')}
+    ${prods.length > 5 ? `<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:6px;">+${prods.length - 5} more products…</div>` : ''}`;
+      if (btn) { btn.style.display = 'flex'; btn.textContent = `✅ Import ${prods.length} Products to My Store`; }
+    }
+
+    function confirmCSVImport() {
+      if (!parsedCSVProducts.length) { alert('No products to import.'); return; }
+      storeProducts.push(...parsedCSVProducts);
+      saveStoreProducts();
+      const count = parsedCSVProducts.length;
+      parsedCSVProducts = [];
+      closeOverlay('overlayCSVUpload');
+      typing(() => {
+        botMsg(`🎉 <strong>${count} products imported</strong> successfully to <strong>${myStore.name}</strong>!`,
+          `<div class="chips">
+        <div class="chip store-chip" onclick="openStoreDashboard()">⚙️ View My Store</div>
+        <div class="chip" onclick="go('browse')">🛍️ Browse Product Categories</div>
+      </div>`
+        );
+      }, 600);
+    }
+
+    // ════════════════════════════════
+    // BUY PIN — WhatsApp redirect
+    // ════════════════════════════════
+    function buyPinViaWA() {
+      if (!myStore) { alert('Register your store first.'); return; }
+      wa(`🔑 *UPLOAD PIN PURCHASE — goSHOPs*\n\n🏪 *Store:* ${myStore.name}\n🆔 *Store ID:* ${myStore.storeId}\n👤 *Owner:* ${myStore.ownerName}\n📞 *Phone:* ${myStore.phone}\n\n💰 *Amount:* ₦5,000 (one-time)\n\nPlease confirm payment and send my Upload PIN. Thank you! 🙏`);
+      closeOverlay('overlayBuyPin');
+      typing(() => { botMsg('📲 <strong>Redirected to WhatsApp!</strong> Our team will confirm your payment and send your Upload PIN instantly.<br><br><strong>Demo PIN:</strong> <code>VISHA2025</code> (for testing)'); });
+    }
+
+    // ════════════════════════════════
+    // MERGE MERCHANT PRODUCTS
+    // ════════════════════════════════
+    function getAllDisplayProducts() {
+      return [...products, ...storeProducts];
+    }
+
+    // ════════════════════════════════
+    // PRODUCT IMAGE HELPER
+    // ════════════════════════════════
+    // Maps product IDs / keywords to curated Unsplash photo IDs for crisp, relevant images.
+    const PRODUCT_IMGS = {
+      // Electronics / Phones
+      'E1': 'photo-1610945415295-d9bbf067e59c', // Samsung Galaxy
+      'E2': 'photo-1496181133206-80ce9b88a853', // HP laptop
+      'HP': 'photo-1498049794561-7780e7231661', // laptop side
+      'E4': 'photo-1593784991095-a205069470b6', // LG TV
+      'E5': 'photo-1523275335684-37898b6baf30', // smart watch
+      'E6': 'photo-1516035069371-29a1b244cc32', // DSLR camera
+      'E3': 'photo-1590658268037-6bf12165a8df', // earbuds
+      // Fashion
+      'F1': 'photo-1529374255404-311a2a4f1fd9', // ankara dress
+      'F4': 'photo-1507003211169-0a1dd7228f2d', // suit
+      'F5': 'photo-1509631179647-0177331693ae', // fabric set
+      'F2': 'photo-1542291026-7eec264c27ff', // Nike
+      'F3': 'photo-1548036328-c9fa89d128fa', // handbag
+      // Groceries
+      'W1': 'photo-1586201375761-83865001e31c', // rice bags
+      'G1': 'photo-1542838132-92c53300491e', // grocery bundle
+      'G2': 'photo-1529692236671-f1f6cf9683ba', // frozen meat
+      'G3': 'photo-1610832958506-aa56368176cf', // fruits basket
+      // Home & Decor
+      'H1': 'photo-1555041469-a586c61ea9bc', // L sofa
+      'H3': 'photo-1524484485831-a92ffc0de03f', // chandelier
+      'H2': 'photo-1463936575829-25148e1db1b8', // indoor plant
+      // Beauty
+      'B1': 'photo-1522335789203-aabd1fc54bc9', // cosmetics
+      'B2': 'photo-1556228578-0d85909e3401', // skincare
+      'B3': 'photo-1604654894610-df63bc536371', // nail art
+      'W2': 'photo-1631390133252-50e6fb878ede', // hair products
+      // Others
+      'GC': 'photo-1518458028785-8fbcd101ebb9', // coins / tokens
+      'DJ': 'photo-1569529465841-dfecdab7503b', // whiskey bottle
+      // Vegetables/Fruits
+      'VF': 'photo-1610832958506-aa56368176cf',
+    };
+
+    // Unsplash keyword fallbacks by category
+    const CAT_QUERIES = {
+      'Electronics & Appliances': '1498049794561-7780e7231661',
+      'Food & Groceries': '1558769132-cb1aea458c5e',
+      'Clothing & Fabric': '1542838132-92c53300491e',
+      'Drinks & Juice': '1555041469-a586c61ea9bc',
+      'Watches & Jewelries': '1522335789203-aabd1fc54bc9',
+      'Shoes & Footwares': '1586880244406-556ebe35f282',
+      'Phones & Tablets': '1518458028785-8fbcd101ebb9',
+      'Computers & Laptops': '1569529465841-dfecdab7503b',
+      'Games & Gears': '1463936575829-25148e1db1b8',
+      'Vegetables & Fruits': '1463936575829-25148e1db1b8',
+      'Seasoning & Spices': '1463936575829-25148e1db1b8',
+      'Medicine & Healthcare': '1463936575829-25148e1db1b8',
+      'Arts & Crafts': '1463936575829-25148e1db1b8',
+      'Plants & Nature': '1463936575829-25148e1db1b8',
+      'Furnitures & Decors': '1463936575829-25148e1db1b8',
+      'Cosmetics & Beauty': '1463936575829-25148e1db1b8',
+      'Bills & Utility': '1463936575829-25148e1db1b8',
+    };
+
+    function getProductImg(p) {
+      const pid = PRODUCT_IMGS[p.id] || CAT_QUERIES[p.cat] || '1556742049-0cfed4f6a9d5';
+      return `https://images.unsplash.com/${pid}?auto=format&fit=crop&w=120&q=72`;
+    }
+
+    // ════════════════════════════════
+    // PRODUCT CARD HTML
+    // ════════════════════════════════
+    function pcard(p) {
+      const inC = cart.some(c => c.id === p.id);
+      const cartItem = cart.find(c => c.id === p.id);
+      const qty = cartItem ? cartItem.qty : 0;
+      const imgSrc = p.imgUrl || getProductImg(p);
+      return `<div class="product-card ${inC ? 'in-cart' : ''}" id="pc-${p.id}">
+    <div class="pc-img-wrap">
+      <img class="pc-img" src="${imgSrc}" alt="${p.name}"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="pc-img-fallback" style="display:none;">${p.emoji}</div>
+    </div>
+    <div class="pc-info">
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+        <span class="pc-name">${p.name}</span>
+        ${p.badge ? `<span class="pc-badge badge-${p.badge}">${p.badge.toUpperCase()}</span>` : ''}
+        ${p._merchant ? `<span class="pc-badge" style="background:var(--store-light);color:var(--store);">MY STORE</span>` : ''}
+      </div>
+      <div class="pc-store">${p.store}${mall && !p._merchant ? '' : p._merchant ? ' · ' + myStore?.name : ''}${mall ? '' : ' · ' + (malls.find(m => m.id === p.mall)?.name || '')}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
+        <span class="pc-price">${p.price}</span>
+        <span class="stars">${'★'.repeat(Math.floor(p.rating))}<span style="font-size:10px;color:var(--text-dim);"> (${p.rating})</span></span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;align-items:center;flex-shrink:0;">
+      ${inC
+          ? `<div class="qty-stepper">
+             <button class="qty-btn" onclick="event.stopPropagation();changeCartQty('${p.id}',-1)">−</button>
+             <span class="qty-val">${qty}</span>
+             <button class="qty-btn" onclick="event.stopPropagation();changeCartQty('${p.id}',1)">+</button>
+           </div>`
+          : `<button class="pc-add" onclick="openQtyConfirm('${p.id}')" title="Add to cart">+</button>`
+        }
+      <span style="font-size:9px;color:var(--text-dim);cursor:pointer;margin-top:2px;" onclick="addCompare('${p.id}')">Compare</span>
+    </div>
+  </div>`;
+    }
+
+    // ════════════════════════════════
+    // BROWSE
+    // ════════════════════════════════
+    function doBrowse() {
+      const all = getAllDisplayProducts();
+      const list = mall ? all.filter(p => p.mall === mall.id || p._merchant).slice(0, 8) : all.slice(0, 8);
+      typing(() => {
+        botMsg(`Here are popular products${mall ? ` under <strong>${mall.name}</strong>` : ''}:`,
+          `<div class="product-list">${list.map(pcard).join('')}</div>
+      <div class="chips" style="margin-top:8px;">
+        <div class="chip" onclick="go('categories')">📂 By Category</div>
+        <div class="chip" onclick="go('deals')">🔥 Deals Only</div>
+        <div class="chip" onclick="openCart()">🛒 Cart (${cart.length})</div>
+        ${myStore ? `<div class="chip store-chip" onclick="viewMyStoreMall()">🏪 My Store</div>` : ''}
+      </div>`);
+      });
+    }
+
+    // ════════════════════════════════
+    // CATEGORIES
+    // ════════════════════════════════
+    function doCategories() {
+      const all = getAllDisplayProducts();
+      const cats = [...new Set(all.map(p => p.cat))];
+      const emap = { Electronics: '📱', Fashion: '👗', Groceries: '🛒', 'Home & Decor': '🛋️', Beauty: '💄', Wholesale: '📦', 'Food & Drinks': '🍽️', Services: '⚙️', Agriculture: '🌾', Health: '🏥', Other: '🏷️' };
+      typing(() => {
+        botMsg('Choose a category:',
+          `<div class="chips">${cats.map(c => `<div class="chip" onclick="doCat('${c}')">${emap[c] || '🏷️'} ${c}</div>`).join('')}</div>`);
+      });
+    }
+
+    function doCat(cat) {
+      userMsg(cat);
+      const all = getAllDisplayProducts();
+      let list = all.filter(p => p.cat === cat);
+      if (mall) list = list.filter(p => p.mall === mall.id || p._merchant);
+      typing(() => {
+        if (!list.length) {
+          botMsg(`No <strong>${cat}</strong> products at ${mall?.name || 'this mall'} right now.`,
+            `<div class="chips"><div class="chip" onclick="changeMall()">🏬 Try Another Category</div><div class="chip" onclick="doCategories()">📂 Other Categories</div></div>`);
+        } else {
+          botMsg(`<strong>${cat}</strong> — ${list.length} items:`,
+            `<div class="product-list">${list.map(pcard).join('')}</div>
+        <div class="chips" style="margin-top:8px;"><div class="chip" onclick="openCart()">🛒 Cart (${cart.length})</div><div class="chip" onclick="doCategories()">← Back</div></div>`);
+        }
+      });
+    }
+
+    // ════════════════════════════════
+    // HOT DEALS
+    // ════════════════════════════════
+    function doDeals() {
+      const all = getAllDisplayProducts();
+      const list = all.filter(p => p.badge === 'hot' || p.badge === 'sale');
+      typing(() => {
+        botMsg('🔥 <strong>Today\'s Hot Deals</strong>',
+          `<div class="product-list">${list.slice(0, 6).map(pcard).join('')}</div>
+      <div class="promo-card"><div>🎁</div><div class="promo-text">Use code for extra 5% off!</div><div class="promo-code" onclick="copyCode(this,'SHOP5')">SHOP5</div></div>
+      <div class="chips" style="margin-top:8px;"><div class="chip" onclick="openCart()">🛒 Cart (${cart.length})</div></div>`);
+      });
+    }
+    function copyCode(el, code) { navigator.clipboard?.writeText(code).catch(() => { }); el.textContent = 'Copied! ✓'; setTimeout(() => el.textContent = code, 1600); }
+
+    // ════════════════════════════════
+    // PROMO
+    // ════════════════════════════════
+    function doPromo() {
+      typing(() => {
+        botMsg('🎁 <strong>Active Promo Codes</strong>',
+          `<div class="info-card">
+        <div class="ic-row"><div class="ic-icon">🎁</div><div class="ic-text"><div class="ic-label">Code</div><b>SHOP5</b> — 5% off any order <span class="promo-code" style="font-size:10px;" onclick="copyCode(this,'SHOP5')">COPY</span></div></div>
+        <div class="ic-row"><div class="ic-icon">🆕</div><div class="ic-text"><div class="ic-label">Code</div><b>NEWBUYER10</b> — 10% off first order <span class="promo-code" style="font-size:10px;" onclick="copyCode(this,'NEWBUYER10')">COPY</span></div></div>
+        <div class="ic-row"><div class="ic-icon">🚚</div><div class="ic-text"><div class="ic-label">Code</div><b>FREESHIP</b> — Free delivery (₦50k+ orders) <span class="promo-code" style="font-size:10px;" onclick="copyCode(this,'FREESHIP')">COPY</span></div></div>
+        <div class="ic-row"><div class="ic-icon">📦</div><div class="ic-text"><div class="ic-label">Code</div><b>BULK20</b> — 20% off bulk (100+ units) <span class="promo-code" style="font-size:10px;" onclick="copyCode(this,'BULK20')">COPY</span></div></div>
+      </div>
+      <div class="chips"><div class="chip" onclick="go('browse')">🛍️ Shop Now</div></div>`);
+      });
+    }
+
+    // ════════════════════════════════
+    // COMPARE
+    // ════════════════════════════════
+    function doCompare() {
+      const all = getAllDisplayProducts();
+      const list = mall ? all.filter(p => p.mall === mall.id || p._merchant).slice(0, 8) : all.slice(0, 8);
+      typing(() => {
+        botMsg('⚖️ Tap <strong>Compare</strong> on any two products:',
+          `<div class="product-list">${list.map(pcard).join('')}</div>
+      <div class="chips" style="margin-top:8px;"><div class="chip" onclick="showCompare()">⚖️ View Comparison (${compareList.length})</div></div>`);
+      });
+    }
+
+    function addCompare(pid) {
+      if (compareList.length >= 2) { compareList = []; }
+      const all = getAllDisplayProducts();
+      if (!compareList.includes(pid)) compareList.push(pid);
+      if (compareList.length === 2) showCompare();
+    }
+
+    function showCompare() {
+      if (compareList.length < 2) { botMsg('Please select at least 2 products to compare.'); return; }
+      const all = getAllDisplayProducts();
+      const [a, b] = compareList.map(id => all.find(p => p.id === id));
+      if (!a || !b) { compareList = []; return; }
+      const rows = [['Price', a.price, b.price], ['Store', a.store, b.store], ['Category', a.cat, b.cat], ['Rating', `${'★'.repeat(Math.floor(a.rating))} ${a.rating}`, `${'★'.repeat(Math.floor(b.rating))} ${b.rating}`]];
+      document.getElementById('compareBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div style="text-align:center;padding:14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;">
+        <div style="width:56px;height:56px;border-radius:10px;overflow:hidden;margin:0 auto 6px;"><img src="${getProductImg(a)}" alt="${a.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'font-size:28px;line-height:56px;\'>${a.emoji}</div>'"></div>
+        <div style="font-size:12px;font-weight:700;">${a.name}</div>
+        <button class="pc-add" style="margin:8px auto 0;" onclick="openQtyConfirm('${a.id}')">+</button>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;">
+        <div style="width:56px;height:56px;border-radius:10px;overflow:hidden;margin:0 auto 6px;"><img src="${getProductImg(b)}" alt="${b.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'font-size:28px;line-height:56px;\'>${b.emoji}</div>'"></div>
+        <div style="font-size:12px;font-weight:700;">${b.name}</div>
+        <button class="pc-add" style="margin:8px auto 0;" onclick="openQtyConfirm('${b.id}')">+</button>
+      </div>
+    </div>
+    ${rows.map(([l, av, bv]) => `<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);width:70px;">${l}</div>
+      <div style="flex:1;font-size:12.5px;font-weight:600;">${av}</div>
+      <div style="flex:1;font-size:12.5px;font-weight:600;">${bv}</div>
+    </div>`).join('')}`;
+      openOverlay('overlayCompare');
+    }
+
+    function submitCompare() {
+      const all = getAllDisplayProducts();
+      const items = compareList.map(id => all.find(p => p.id === id)).filter(Boolean);
+      if (!items.length) return;
+      wa(`⚖️ *PRODUCT COMPARISON REQUEST — goSHOPs*\n\nI'd like a recommendation between:\n\n${items.map(p => `• *${p.name}* — ${p.price} (${p.store})`).join('\n')}\n\n🏬 Mall: ${mall?.name || 'Any'}\n\nWhich one do you recommend? ⏰ ${ts()}`);
+      closeOverlay('overlayCompare');
+    }
+
+    // ════════════════════════════════
+    // CART
+    // ════════════════════════════════
+    // ════════════════════════════════
+    // QUANTITY CONFIRMATION FLOW
+    // ════════════════════════════════
+    let _qcsProductId = null;
+    let _qcsQty = 1;
+
+    function openQtyConfirm(pid) {
+      const all = getAllDisplayProducts();
+      const p = all.find(x => x.id === pid);
+      if (!p) return;
+      if (cart.some(c => c.id === pid)) { changeCartQty(pid, 1); return; }
+      _qcsProductId = pid;
+      _qcsQty = 1;
+      // set image
+      const imgEl = document.getElementById('qcsImg');
+      const txtEl = document.getElementById('qcsEmojiText');
+      const imgSrc = p.imgUrl || getProductImg(p);
+      imgEl.src = imgSrc; imgEl.style.display = 'block'; imgEl.alt = p.name;
+      txtEl.textContent = p.emoji; txtEl.style.display = 'none';
+      document.getElementById('qcsName').textContent = p.name;
+      document.getElementById('qcsPrice').textContent = p.price;
+      document.getElementById('qcsStore').textContent = p.store;
+      document.getElementById('qcsCount').textContent = _qcsQty;
+      document.getElementById('qcsSubtotal').textContent = '₦' + (p.num * _qcsQty).toLocaleString();
+      openOverlay('overlayQtyConfirm');
+    }
+
+    function qcsChange(delta) {
+      const all = getAllDisplayProducts();
+      const p = all.find(x => x.id === _qcsProductId);
+      if (!p) return;
+      _qcsQty = Math.max(1, _qcsQty + delta);
+      document.getElementById('qcsCount').textContent = _qcsQty;
+      document.getElementById('qcsSubtotal').textContent = '₦' + (p.num * _qcsQty).toLocaleString();
+    }
+
+    function confirmAddToCart() {
+      const all = getAllDisplayProducts();
+      const p = all.find(x => x.id === _qcsProductId);
+      if (!p) return;
+      closeOverlay('overlayQtyConfirm');
+      addCart(_qcsProductId, _qcsQty);
+    }
+
+    function addCart(pid, qty) {
+      qty = qty || 1;
+      const all = getAllDisplayProducts();
+      const p = all.find(x => x.id === pid); if (!p) return;
+      const existing = cart.find(c => c.id === pid);
+      if (existing) {
+        existing.qty = (existing.qty || 1) + qty;
+        existing._total = p.num * existing.qty;
+      } else {
+        cart.push({ ...p, qty, _total: p.num * qty });
+      }
+      // refresh any visible pcard for this product
+      const card = document.getElementById('pc-' + pid);
+      if (card) {
+        const cartItem = cart.find(c => c.id === pid);
+        card.classList.add('in-cart');
+        const btnWrap = card.querySelector('[style*="flex-direction:column"]');
+        if (btnWrap) {
+          btnWrap.innerHTML = `<div class="qty-stepper">
+            <button class="qty-btn" onclick="event.stopPropagation();changeCartQty('${pid}',-1)">−</button>
+            <span class="qty-val">${cartItem.qty}</span>
+            <button class="qty-btn" onclick="event.stopPropagation();changeCartQty('${pid}',1)">+</button>
+          </div>
+          <span style="font-size:9px;color:var(--text-dim);cursor:pointer;margin-top:2px;" onclick="addCompare('${pid}')">Compare</span>`;
+        }
+      }
+      typing(() => {
+        botMsg(`✅ <strong>${p.name}</strong> ×${qty} added to cart!`,
+          `<div class="chips"><div class="chip" onclick="openCart()">🛒 Cart (${cart.length})</div><div class="chip" onclick="openOverlay('overlayOrder')">⚡ Order Now</div><div class="chip" onclick="go('browse')">➕ Add More</div></div>`);
+      }, 400);
+    }
+
+    function changeCartQty(pid, delta) {
+      const all = getAllDisplayProducts();
+      const p = all.find(x => x.id === pid);
+      const item = cart.find(c => c.id === pid);
+      if (!item) return;
+      item.qty = Math.max(0, (item.qty || 1) + delta);
+      if (item.qty === 0) {
+        cart = cart.filter(c => c.id !== pid);
+        // reset card
+        const card = document.getElementById('pc-' + pid);
+        if (card) {
+          card.classList.remove('in-cart');
+          const btnWrap = card.querySelector('[style*="flex-direction:column"]');
+          if (btnWrap) btnWrap.innerHTML = `<button class="pc-add" onclick="openQtyConfirm('${pid}')" title="Add to cart">+</button><span style="font-size:9px;color:var(--text-dim);cursor:pointer;margin-top:2px;" onclick="addCompare('${pid}')">Compare</span>`;
+        }
+        return;
+      }
+      if (p) item._total = p.num * item.qty;
+      // update stepper display
+      const card = document.getElementById('pc-' + pid);
+      if (card) {
+        const qtyVal = card.querySelector('.qty-val');
+        if (qtyVal) qtyVal.textContent = item.qty;
+      }
+    }
+
+    function openCart() {
+      if (!cart.length) {
+        document.getElementById('cartBody').innerHTML = `<div style="text-align:center;padding:40px 20px;"><div style="font-size:48px;">🛒</div><p style="margin-top:12px;color:var(--text-muted);">Your cart is empty</p></div>`;
+        document.getElementById('cartFooter').innerHTML = `<button class="wa-btn wa-btn-ghost" onclick="closeOverlay('overlayCart');go('browse')">🛍️ Start Shopping</button>`;
+      } else {
+        const total = cart.reduce((a, b) => a + (b._total || b.num), 0);
+        document.getElementById('cartBody').innerHTML = `
+      <div class="cart-card">
+        ${cart.map(i => {
+          const imgSrc = i.imgUrl || getProductImg(i);
+          return `<div class="cart-item-row">
+          <div style="width:40px;height:40px;border-radius:9px;overflow:hidden;flex-shrink:0;background:var(--surface2);">
+            <img src="${imgSrc}" alt="${i.name}" style="width:40px;height:40px;object-fit:cover;display:block;"
+                 onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\'width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;\'>${i.emoji}</div>'">
+          </div>
+          <div class="cir-name">${i.name}<br><span style="font-size:10px;color:var(--text-dim);">${i.store}</span></div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div class="cir-price">${i.price}<span class="cir-qty">×${i.qty || 1}</span></div>
+            <div style="display:flex;align-items:center;gap:5px;margin-top:5px;justify-content:flex-end;">
+              <button style="width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border2);background:var(--surface);color:var(--teal-deep);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="changeCartQtyInCart('${i.id}',-1)">−</button>
+              <button style="width:24px;height:24px;border-radius:6px;border:1.5px solid var(--border2);background:var(--surface);color:var(--teal-deep);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="changeCartQtyInCart('${i.id}',1)">+</button>
+              <span style="font-size:10px;color:var(--coral);cursor:pointer;margin-left:2px;" onclick="rmCart('${i.id}')">✕</span>
+            </div>
+          </div>
+        </div>`;
+        }).join('')}
+        <div class="cart-total-row"><span style="font-size:13px;font-weight:700;">Total</span><span style="font-size:17px;font-weight:800;color:var(--teal-deep);">₦${total.toLocaleString()}</span></div>
+      </div>`;
+        document.getElementById('cartFooter').innerHTML = `
+      <button class="wa-btn" onclick="closeOverlay('overlayCart');openOverlay('overlayOrder')">📦 Place Order</button>
+      <button class="wa-btn wa-btn-ghost" style="margin-top:8px;" onclick="cart=[];openCart()">🗑️ Clear Cart</button>`;
+      }
+      openOverlay('overlayCart');
+    }
+
+    function changeCartQtyInCart(pid, delta) {
+      const all = getAllDisplayProducts();
+      const p = all.find(x => x.id === pid);
+      const item = cart.find(c => c.id === pid);
+      if (!item) return;
+      item.qty = Math.max(0, (item.qty || 1) + delta);
+      if (item.qty === 0) { cart = cart.filter(c => c.id !== pid); }
+      else if (p) { item._total = p.num * item.qty; }
+      openCart(); // re-render cart
+    }
+    function rmCart(pid) { cart = cart.filter(c => c.id !== pid); openCart(); }
+
+    // ════════════════════════════════
+    // SUBMIT HANDLERS → WhatsApp
+    // ════════════════════════════════
+    function submitOrder() {
+      const name = document.getElementById('oName').value.trim();
+      const phone = document.getElementById('oPhone').value.trim();
+      const addr = document.getElementById('oAddress').value.trim();
+      const city = document.getElementById('oCity').value.trim();
+      const state = document.getElementById('oState').value;
+      const payment = document.getElementById('oPayment').value;
+      const notes = document.getElementById('oNotes').value.trim();
+      if (!name || !phone || !addr) { alert('Please fill in name, phone and delivery address.'); return; }
+      const items = cart.length ? cart.map(p => `• ${p.name} — ${p.price}`).join('\n') : '(Inquiry)';
+      const total = cart.reduce((a, b) => a + b.num, 0);
+      const msg = `🛍️ *NEW ORDER — goSHOPs*\n\n🏬 *Mall:* ${mall?.name || 'N/A'}\n👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📍 *Address:* ${addr}, ${city}, ${state}\n💳 *Payment:* ${payment}\n\n🛒 *Items:*\n${items}\n\n💰 *Total:* ₦${total.toLocaleString()}\n${notes ? `📝 *Notes:* ${notes}\n` : ''}\n⏰ ${ts()} via goSHOPs`;
+      closeOverlay('overlayOrder'); wa(msg); cart = [];
+      typing(() => { botMsg('🎉 <strong>Order sent!</strong> You\'ve been redirected to WhatsApp to confirm with our team.', `<div class="chips"><div class="chip" onclick="go('track')">🚚 Track Later</div><div class="chip" onclick="go('browse')">🛍️ Shop More</div></div>`); }, 600);
+    }
+    function submitTrack() {
+      const id = document.getElementById('trackId').value.trim();
+      if (!id) { alert('Please enter your order ID or phone number.'); return; }
+      wa(`🚚 *ORDER TRACKING — goSHOPs*\n\n📦 *Order ID/Phone:* ${id}\n🏬 *Mall:* ${mall?.name || 'N/A'}\n⏰ ${ts()}`);
+      closeOverlay('overlayTrack');
+      typing(() => { botMsg('🚚 Redirected to WhatsApp! Our team will reply with your live order status.'); });
+    }
+    function submitSupport() {
+      const name = document.getElementById('sName').value.trim();
+      const type = document.getElementById('sType').value;
+      const order = document.getElementById('sOrder').value.trim();
+      const desc = document.getElementById('sDesc').value.trim();
+      if (!name || !desc) { alert('Please fill in your name and describe the issue.'); return; }
+      wa(`🎧 *SUPPORT TICKET — goSHOPs*\n\n👤 *Name:* ${name}\n🏬 *Mall:* ${mall?.name || 'N/A'}\n❓ *Issue:* ${type}\n📦 *Order ID:* ${order || 'N/A'}\n📝 *Details:*\n${desc}\n\n⏰ ${ts()}`);
+      closeOverlay('overlaySupport');
+      typing(() => { botMsg('🎧 <strong>Ticket submitted!</strong> Our support team will respond within 30 minutes.'); });
+    }
+    function submitReturn() {
+      const order = document.getElementById('rOrder').value.trim();
+      const item = document.getElementById('rItem').value.trim();
+      const reason = document.getElementById('rReason').value;
+      const res = document.getElementById('rResolution').value;
+      if (!order || !item) { alert('Please enter order ID and item name.'); return; }
+      wa(`↩️ *RETURN REQUEST — goSHOPs*\n\n📦 *Order ID:* ${order}\n🏷️ *Item:* ${item}\n🏬 *Mall:* ${mall?.name || 'N/A'}\n❓ *Reason:* ${reason}\n✅ *Resolution:* ${res}\n\n⏰ ${ts()}`);
+      closeOverlay('overlayReturn');
+      typing(() => { botMsg('↩️ <strong>Return request submitted!</strong> Our returns team will respond within 3–5 business days.'); });
+    }
+    function submitBulk() {
+      const name = document.getElementById('bName').value.trim();
+      const prod = document.getElementById('bProduct').value.trim();
+      const qty = document.getElementById('bQty').value.trim();
+      const budget = document.getElementById('bBudget').value.trim();
+      const loc = document.getElementById('bLocation').value.trim();
+      if (!name || !prod || !qty) { alert('Please fill in name, product and quantity.'); return; }
+      wa(`📋 *BULK/WHOLESALE REQUEST — goSHOPs*\n\n👤 *Name:* ${name}\n📦 *Products:*\n${prod}\n🔢 *Quantity:* ${qty} units\n💰 *Budget:* ${budget || 'Open'}\n📍 *Delivery:* ${loc || 'TBD'}\n\n⏰ ${ts()}`);
+      closeOverlay('overlayRFQ');
+      typing(() => { botMsg('📋 <strong>Bulk request sent!</strong> Our wholesale team will respond with a custom quote within 2 hours.'); });
+    }
+    function submitAlert() {
+      const prod = document.getElementById('alProduct').value.trim();
+      const price = document.getElementById('alPrice').value.trim();
+      const phone = document.getElementById('alPhone').value.trim();
+      const when = document.getElementById('alWhen').value;
+      if (!prod || !phone) { alert('Please enter the product name and your WhatsApp number.'); return; }
+      wa(`🔔 *PRICE ALERT — goSHOPs*\n\n📦 *Product:* ${prod}\n💰 *Target Price:* ${price ? '₦' + Number(price).toLocaleString() : 'Any drop'}\n📱 *Alert Number:* ${phone}\n🔔 *When:* ${when}\n\n⏰ ${ts()}`);
+      closeOverlay('overlayAlert');
+      typing(() => { botMsg('🔔 <strong>Price alert set!</strong> We\'ll notify you on WhatsApp when the price drops.'); });
+    }
+    function submitReview() {
+      const name = document.getElementById('rvName').value.trim();
+      const prod = document.getElementById('rvProduct').value.trim();
+      const stars = document.getElementById('rvStars').value;
+      const text = document.getElementById('rvText').value.trim();
+      if (!name || !prod || !text) { alert('Please fill in all review fields.'); return; }
+      wa(`⭐ *REVIEW — goSHOPs*\n\n👤 *Reviewer:* ${name}\n📦 *Product/Store:* ${prod}\n⭐ *Rating:* ${'⭐'.repeat(parseInt(stars))} (${stars}/5)\n📝 *Review:*\n${text}\n\n⏰ ${ts()}`);
+      closeOverlay('overlayReview');
+      typing(() => { botMsg('⭐ <strong>Thank you for your review!</strong> It helps other shoppers. 💚'); });
+    }
+
+    // ════════════════════════════════
+    // SUPPORT, TRACK, BULK, RETURN, etc.
+    // ════════════════════════════════
+    function doTrack() { typing(() => { botMsg('Please enter your order details to get a live status update:', `<div class="chips"><div class="chip" onclick="openOverlay('overlayTrack')">🔍 Enter Order ID</div></div>`); }); }
+    function doBulk() { typing(() => { botMsg('📦 <strong>Bulk & Wholesale Orders</strong><br><br>• 10–49 units → <strong>5% off</strong><br>• 50–99 units → <strong>10% off</strong><br>• 100+ units → <strong>Custom quote</strong>', `<div class="chips"><div class="chip" onclick="openOverlay('overlayRFQ')">📋 Request Quote</div></div>`); }); }
+    function doReturn() { typing(() => { botMsg('↩️ <strong>Return Policy</strong><br><br>• Returns within <strong>7 days</strong> of delivery<br>• Unused, original packaging required<br>• Refunds in <strong>3–5 business days</strong>', `<div class="chips"><div class="chip" onclick="openOverlay('overlayReturn')">↩️ Start Return</div><div class="chip" onclick="go('support')">🎧 Contact Support</div></div>`); }); }
+    function doAlert() { typing(() => { botMsg('🔔 <strong>Price Alerts</strong><br><br>Set a target price and I\'ll notify you on WhatsApp when it drops!', `<div class="chips"><div class="chip" onclick="openOverlay('overlayAlert')">🔔 Set Alert</div></div>`); }); }
+    function doReview() { typing(() => { botMsg('⭐ Your feedback matters! Share your experience:', `<div class="chips"><div class="chip" onclick="openOverlay('overlayReview')">✍️ Write Review</div></div>`); }); }
+
+    // ════════════════════════════════
+    // SUPPORT (FAQs)
+    // ════════════════════════════════
+    function doSupport() {
+      typing(() => {
+        botMsg('🎧 <strong>Customer Support</strong><br>What can I help you with?',
+          `<div class="chips">
+        <div class="chip" onclick="showFaq('delivery')">🚚 Delivery Info</div>
+        <div class="chip" onclick="showFaq('payment')">💳 Payment Help</div>
+        <div class="chip" onclick="showFaq('return')">↩️ Return Policy</div>
+        <div class="chip" onclick="showFaq('warranty')">🛡️ Warranty</div>
+        <div class="chip" onclick="showFaq('bulk')">📦 Bulk Pricing</div>
+        <div class="chip" onclick="openOverlay('overlaySupport')">📝 Submit Ticket</div>
+      </div>`);
+      });
+    }
+    function showFaq(key) {
+      const f = faqs[key]; if (!f) return;
+      userMsg(f.q);
+      typing(() => {
+        botMsg(f.a, `<div class="chips"><div class="chip" onclick="openOverlay('overlaySupport')">📝 Still need help?</div><div class="chip" onclick="doSupport()">← Back</div></div>`);
+      });
+    }
+
+    // ════════════════════════════════
+    // SEARCH
+    // ════════════════════════════════
+    function openSearch() { openOverlay('overlaySearch'); setTimeout(() => document.getElementById('searchInput').focus(), 300); }
+    function liveSearch(q) {
+      const el = document.getElementById('searchResults');
+      if (!q.trim()) { el.innerHTML = ''; return; }
+      const all = getAllDisplayProducts();
+      const res = all.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.cat.toLowerCase().includes(q.toLowerCase()) || p.store.toLowerCase().includes(q.toLowerCase()));
+      el.innerHTML = res.length
+        ? `<div class="product-list">${res.slice(0, 8).map(pcard).join('')}</div>`
+        : `<div style="text-align:center;padding:24px;color:var(--text-muted);">No results for "${q}"<br><br><button class="wa-btn" style="width:auto;padding:10px 18px;" onclick="searchOnWA('${q}')">📲 Ask on WhatsApp</button></div>`;
+    }
+    function searchOnWA(q) { wa(`🔍 *PRODUCT SEARCH — goSHOPs*\n\nI'm looking for: *${q}*\n🏬 Mall: ${mall?.name || 'Any'}\n\nDo you have this available?`); }
+
+    // ════════════════════════════════
+    // OVERLAY
+    // ════════════════════════════════
+    function openOverlay(id) { document.getElementById(id)?.classList.add('open'); }
+    function closeOverlay(id) { document.getElementById(id)?.classList.remove('open'); }
+    document.querySelectorAll('.overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); }); });
+
+    // ════════════════════════════════
+    // STAR RATING
+    // ════════════════════════════════
+    function setStar(n) {
+      document.getElementById('rvStars').value = n;
+      document.querySelectorAll('.star-btn').forEach((s, i) => {
+        s.style.filter = i < n ? 'none' : 'grayscale(1) opacity(.35)';
+      });
+    }
+
+    // ════════════════════════════════
+    // FREE TEXT CHAT
+    // ════════════════════════════════
+    function sendUserMsg() {
+      const inp = document.getElementById('chatInput');
+      const t = inp.value.trim(); if (!t) return;
+      inp.value = ''; inp.style.height = 'auto';
+      userMsg(t);
+      const l = t.toLowerCase();
+      if (!mall && !myStore) { typing(() => { botMsg('Please pick a category to shop or set up your store first! 🏬', mallGrid()); }); return; }
+      if (/^(hi|hello|hey|good|morning|afternoon|evening)/i.test(l)) { typing(() => { botMsg(`Hey there! 😊 How can I help you${mall ? ` shop at <strong>${mall.name}</strong>` : myStore ? ` manage <strong>${myStore.name}</strong>` : ''} today?`, mainMenu()); }); }
+      else if (/store|my store|add store|register store/i.test(l)) { doAddStore(); }
+      else if (/return|refund|exchange/i.test(l)) { doReturn(); }
+      else if (/track|where.*order|status/i.test(l)) { doTrack(); }
+      else if (/deal|sale|offer|discount|promo/i.test(l)) { doDeals(); }
+      else if (/bulk|wholesale|quantity|large order/i.test(l)) { doBulk(); }
+      else if (/support|help|problem|issue|complaint/i.test(l)) { doSupport(); }
+      else if (/pay|transfer|bank|ussd/i.test(l)) { showFaq('payment'); }
+      else if (/deliver|ship|how long/i.test(l)) { showFaq('delivery'); }
+      else if (/warranty|guarantee/i.test(l)) { showFaq('warranty'); }
+      else if (/promo|coupon|code/i.test(l)) { doPromo(); }
+      else if (/cart|basket/i.test(l)) { openCart(); }
+      else if (/compare/i.test(l)) { doCompare(); }
+      else if (/review|feedback/i.test(l)) { doReview(); }
+      else if (/alert|notify|price drop/i.test(l)) { doAlert(); }
+      else if (/phone|laptop|tablet|tv|tech|electr/i.test(l)) { doCat('Electronics'); }
+      else if (/cloth|fashion|dress|shoe|wear|style/i.test(l)) { doCat('Fashion'); }
+      else if (/food|grocery|fruit|meat|fresh/i.test(l)) { doCat('Groceries'); }
+      else if (/home|furniture|sofa|decor|plant|light/i.test(l)) { doCat('Home & Decor'); }
+      else if (/beauty|cosmetic|skin|makeup|nails/i.test(l)) { doCat('Beauty'); }
+      else if (/mall|change mall/i.test(l)) { changeMall(); }
+      else if (/csv|upload|bulk upload/i.test(l)) { openCSVUpload(); }
+      else if (/pin|unlock/i.test(l)) { openOverlay('overlayBuyPin'); }
+      else {
+        const all = getAllDisplayProducts();
+        const res = all.filter(p => p.name.toLowerCase().includes(l) || p.cat.toLowerCase().includes(l));
+        if (res.length) {
+          typing(() => { botMsg(`Found <strong>${res.length} result(s)</strong> for "<strong>${t}</strong>":`, `<div class="product-list">${res.slice(0, 5).map(pcard).join('')}</div>`); });
+        } else {
+          typing(() => {
+            botMsg(`I couldn't find "<strong>${t}</strong>" — but I can ask our team directly!`,
+              `<div class="chips"><div class="chip" onclick="searchOnWA('${t}')">📲 Ask on WhatsApp</div><div class="chip" onclick="go('browse')">🛍️ Browse All</div></div>${mainMenu()}`);
+          });
+        }
+      }
+    }
+
+    // ════════════════════════════════
+    // INPUT
+    // ════════════════════════════════
+    document.getElementById('chatInput').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendUserMsg(); } });
+    document.getElementById('chatInput').addEventListener('input', function () { this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px'; });
+
+    // ════════════════════════════════
+    // INIT
+    // ════════════════════════════════
+    window.onload = () => {
+      const h = new Date().getHours();
+      const g = h < 12 ? 'Good morning ☀️' : 'Good afternoon 🌤️';
+      setTimeout(() => {
+        botMsg(`${g}! 👋 I'm <strong>ViShA</strong> — your smart personal shopping assistant.<br><br>
+I can help you <strong>find products, compare prices, place orders</strong> — and now you can <strong>list your own store</strong> with a free digital storefront! 🏪💚`);
+      }, 500);
+      setTimeout(() => {
+        typing(() => {
+          const storeMsg = myStore
+            ? `Welcome back, <strong>${myStore.ownerName}</strong>! 🏪 Your store <strong>${myStore.name}</strong> is live. Pick a category or manage your store:`
+            : 'To get started, please <strong>select a category to shop </strong> — or click  <strong>Join Vendors</strong> to Start Selling! 🏬';
+          botMsg(storeMsg, mallGrid());
+        }, 1400);
+      }, 1400);
+    };
+
+  </script>
+
+</body>
+
+</html>
